@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.system.mapper.NotificationMapper">
+    <resultMap id="BaseResultMap" type="com.project.system.domain.Notification">
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="user_name" property="userName" jdbcType="VARCHAR" />
+        <result column="message" property="message" jdbcType="LONGVARCHAR" />
+        <result column="is_read" property="isRead" jdbcType="BOOLEAN" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <insert id="insertNotification" parameterType="com.project.system.domain.Notification">
+        INSERT INTO notifications (user_name, message, is_read, created_at)
+        VALUES (#{userName}, #{message}, #{isRead}, #{createdAt})
+    </insert>
+
+    <select id="selectNotificationsByUserName" resultMap="BaseResultMap" parameterType="String">
+        SELECT
+            id,
+            user_name,
+            message,
+            is_read,
+            created_at
+        FROM
+            notifications
+        WHERE
+            user_name = #{userName}
+    </select>
+
+    <update id="markNotificationAsRead" parameterType="Long">
+        UPDATE notifications SET is_read = TRUE WHERE id = #{id}
+    </update>
+</mapper>

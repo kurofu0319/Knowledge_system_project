@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.system.mapper.ForumPostMapper">
+    <resultMap id="BaseResultMap" type="com.project.system.domain.ForumPost">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="title" property="title" jdbcType="VARCHAR"/>
+        <result column="content" property="content" jdbcType="LONGVARCHAR"/>
+        <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+        <result column="post_time" property="postTime" jdbcType="TIMESTAMP"/>
+        <result column="likes" property="likes" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <select id="selectAllPosts" resultMap="BaseResultMap">
+        SELECT id, title, content, user_name, post_time, likes FROM forum_post
+    </select>
+
+    <select id="selectPostById" resultMap="BaseResultMap" parameterType="Long">
+        SELECT id, title, content, user_name, post_time, likes FROM forum_post WHERE id = #{id}
+    </select>
+
+    <insert id="insertPost" parameterType="com.project.system.domain.ForumPost">
+        INSERT INTO forum_post (title, content, user_name, post_time, likes) VALUES (#{title}, #{content}, #{userName}, #{postTime}, #{likes})
+    </insert>
+
+    <delete id="deletePostById" parameterType="Long">
+        DELETE FROM forum_post WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteRepliesByPostId" parameterType="Long">
+        DELETE FROM forum_reply WHERE post_id = #{id}
+    </delete>
+
+    <delete id="deleteLikesByPostId" parameterType="Long">
+        DELETE FROM forum_likes WHERE post_id = #{id} OR reply_id in (SELECT id FROM forum_reply WHERE post_id = #{id})
+    </delete>
+
+    <delete id="deletePostAndRepliesById" parameterType="map">
+        DELETE FROM forum_post WHERE id = #{id} AND user_name = #{userName}
+    </delete>
+
+    <insert id="likePost" parameterType="com.project.system.domain.ForumLike">
+        INSERT INTO forum_likes (user_name, post_id, created_at) VALUES (#{userName}, #{postId}, #{createdAt})
+    </insert>
+
+    <delete id="unlikePost" parameterType="com.project.system.domain.ForumLike">
+        DELETE FROM forum_likes WHERE user_name = #{userName} AND post_id = #{postId}
+    </delete>
+
+    <update id="incrementPostLikes" parameterType="Long">
+        UPDATE forum_post SET likes = likes + 1 WHERE id = #{id}
+    </update>
+
+    <update id="decrementPostLikes" parameterType="Long">
+        UPDATE forum_post SET likes = likes - 1 WHERE id = #{id}
+    </update>
+
+    <select id="checkUserLikeStatus" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM forum_likes WHERE user_name = #{userName} AND post_id = #{postId}
+    </select>
+</mapper>

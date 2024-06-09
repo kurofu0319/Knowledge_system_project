@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.system.mapper.ForumReplyMapper">
+    <resultMap id="BaseResultMap" type="com.project.system.domain.ForumReply">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="post_id" property="postId" jdbcType="BIGINT"/>
+        <result column="user_name" property="userName" jdbcType="VARCHAR"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="reply_time" property="replyTime" jdbcType="TIMESTAMP"/>
+        <result column="likes" property="likes" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <select id="selectRepliesByPostId" resultMap="BaseResultMap">
+        SELECT id, post_id, user_name, content, reply_time, likes FROM forum_reply WHERE post_id = #{postId}
+    </select>
+
+    <select id="selectReplyById" resultMap="BaseResultMap" parameterType="Long">
+        SELECT id, post_id, user_name, content, reply_time, likes FROM forum_reply WHERE id = #{id}
+    </select>
+
+    <insert id="insertReply" parameterType="com.project.system.domain.ForumReply">
+        INSERT INTO forum_reply (post_id, user_name, content, reply_time, likes) VALUES (#{postId}, #{userName}, #{content}, #{replyTime}, #{likes})
+    </insert>
+
+    <delete id="deleteReplyById" parameterType="Long">
+        DELETE FROM forum_reply WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteLikesById" parameterType="Long">
+        DELETE FROM forum_likes WHERE reply_id = #{id}
+    </delete>
+
+    <insert id="likeReply" parameterType="com.project.system.domain.ForumLike">
+        INSERT INTO forum_likes (user_name, reply_id, created_at) VALUES (#{userName}, #{replyId}, #{createdAt})
+    </insert>
+
+    <delete id="unlikeReply" parameterType="com.project.system.domain.ForumLike">
+        DELETE FROM forum_likes WHERE user_name = #{userName} AND reply_id = #{replyId}
+    </delete>
+
+    <update id="incrementReplyLikes" parameterType="Long">
+        UPDATE forum_reply SET likes = likes + 1 WHERE id = #{id}
+    </update>
+
+    <update id="decrementReplyLikes" parameterType="Long">
+        UPDATE forum_reply SET likes = likes - 1 WHERE id = #{id}
+    </update>
+
+    <select id="checkUserLikeStatus" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM forum_likes WHERE user_name = #{userName} AND reply_id = #{replyId}
+    </select>
+</mapper>
