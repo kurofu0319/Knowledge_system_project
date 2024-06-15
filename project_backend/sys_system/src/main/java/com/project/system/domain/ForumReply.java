@@ -7,6 +7,8 @@ public class ForumReply {
     private String content;
     private String replyTime;
     private int likes;
+    private String fileUrl; // 新增字段
+    private String fileName; // 新增字段
 
     public Long getId() {
         return id;
@@ -54,5 +56,21 @@ public class ForumReply {
 
     public void setLikes(int likes) {
         this.likes = likes;
+    }
+
+    public String getFileUrl() {
+        return fileUrl;
+    }
+
+    public void setFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 }

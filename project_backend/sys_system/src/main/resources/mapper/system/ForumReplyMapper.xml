@@ -11,18 +11,21 @@
         <result column="content" property="content" jdbcType="VARCHAR"/>
         <result column="reply_time" property="replyTime" jdbcType="TIMESTAMP"/>
         <result column="likes" property="likes" jdbcType="INTEGER"/>
+        <result column="file_url" property="fileUrl" jdbcType="VARCHAR"/>
+        <result column="file_name" property="fileName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <select id="selectRepliesByPostId" resultMap="BaseResultMap">
-        SELECT id, post_id, user_name, content, reply_time, likes FROM forum_reply WHERE post_id = #{postId}
+        SELECT id, post_id, user_name, content, reply_time, likes, file_url, file_name FROM forum_reply WHERE post_id = #{postId}
     </select>
 
     <select id="selectReplyById" resultMap="BaseResultMap" parameterType="Long">
-        SELECT id, post_id, user_name, content, reply_time, likes FROM forum_reply WHERE id = #{id}
+        SELECT id, post_id, user_name, content, reply_time, likes, file_url, file_name FROM forum_reply WHERE id = #{id}
     </select>
 
     <insert id="insertReply" parameterType="com.project.system.domain.ForumReply">
-        INSERT INTO forum_reply (post_id, user_name, content, reply_time, likes) VALUES (#{postId}, #{userName}, #{content}, #{replyTime}, #{likes})
+        INSERT INTO forum_reply (post_id, user_name, content, reply_time, likes, file_url, file_name)
+        VALUES (#{postId}, #{userName}, #{content}, #{replyTime}, #{likes}, #{fileUrl}, #{fileName})
     </insert>
 
     <delete id="deleteReplyById" parameterType="Long">

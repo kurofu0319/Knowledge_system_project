@@ -15,7 +15,7 @@ import com.project.system.service.IForumReplyService;
 /**
  * 论坛
  *
- * @author Furui
+ * author Furui
  */
 
 @RestController
@@ -108,6 +108,5 @@ public class ForumController extends BaseController {
         response.put("liked", liked);
         return response;
     }
-
 
 }

@@ -48,7 +48,7 @@ export function deletePostById(id, userName) {
     url: `/forum/post/${id}`,
     method: 'delete',
     params: { userName }
-  });
+  })
 }
 
 // 点赞帖子
@@ -57,7 +57,7 @@ export function likePost(postId, userName) {
     url: `/forum/post/${postId}/like`,
     method: 'post',
     params: { userName }
-  });
+  })
 }
 
 // 取消点赞帖子
@@ -66,7 +66,7 @@ export function unlikePost(postId, userName) {
     url: `/forum/post/${postId}/unlike`,
     method: 'delete',
     params: { userName }
-  });
+  })
 }
 
 // 点赞回复
@@ -75,7 +75,7 @@ export function likeReply(replyId, userName) {
     url: `/forum/reply/${replyId}/like`,
     method: 'post',
     params: { userName }
-  });
+  })
 }
 
 // 取消点赞回复
@@ -84,7 +84,7 @@ export function unlikeReply(replyId, userName) {
     url: `/forum/reply/${replyId}/unlike`,
     method: 'delete',
     params: { userName }
-  });
+  })
 }
 
 // 获取用户的通知
@@ -92,7 +92,7 @@ export function getNotificationsByUserName(userName) {
   return request({
     url: `/forum/notifications/${userName}`,
     method: 'get'
-  });
+  })
 }
 
 // 标记通知为已读
@@ -100,7 +100,7 @@ export function markNotificationAsRead(notificationId) {
   return request({
     url: `/forum/notification/${notificationId}/read`,
     method: 'post'
-  });
+  })
 }
 
 // 删除回复
@@ -126,5 +126,37 @@ export function checkUserReplyLikeStatus(replyId, userName) {
     url: `/forum/reply/${replyId}/like-status`,
     method: 'get',
     params: { userName }
+  })
+}
+
+// 上传文件
+export function uploadFile(formData) {
+  return request({
+    url: '/common/upload',
+    method: 'post',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}
+
+// 下载文件
+export function downloadFile(fileName) {
+  return request({
+    url: '/common/download',
+    method: 'get',
+    params: { fileName },
+    responseType: 'blob'  // 需要将响应类型设置为blob
+  })
+}
+
+// 下载资源文件
+export function downloadResource(resource) {
+  return request({
+    url: '/common/download/resource',
+    method: 'get',
+    params: { resource },
+    responseType: 'blob'  // 需要将响应类型设置为blob
   })
 }

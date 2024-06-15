@@ -1,38 +1,61 @@
 <template>
-  <view class="post-detail-container">
-    <view class="post-header">
-      <text class="post-title">{{ post.title }}</text>
-      <view class="spacer"></view>
-      <text class="post-content">{{ post.content }}</text>
-      <view class="spacer"></view>
-      <view class="post-user-container">
-        <text class="post-user">{{ post.userName }} - {{ post.postTime }}</text>
-		&nbsp;
-        <text class="post-likes">Likes: {{ post.likes }}</text>
+  <div class="post-detail-container">
+    <div class="post-header">
+      <h1 class="post-title">{{ post.title }}</h1>
+      <div class="spacer"></div>
+      <p class="post-content">{{ post.content }}</p>
+      <div class="spacer"></div>
+      <div class="post-user-container">
+        <span class="post-user">{{ post.userName }} - {{ post.postTime }}</span>
+        &nbsp;
+        <span class="post-likes">Likes: {{ post.likes }}</span>
         <button @click="toggleLikePost" class="like-btn">{{ likedPost ? 'Unlike' : 'Like' }}</button>
-      </view>
-    </view>
+      </div>
+    </div>
     <button @click="deletePost" v-if="post.userName === $store.state.user.name" class="delete-post-btn">删除帖子</button>
-    <view class="replies">
-      <view class="reply-item" v-for="reply in replies" :key="reply.id">
-        <text class="reply-content">{{ reply.content }}</text>
-        <view class="spacer"></view>
-        <view class="reply-user-container">
-          <text class="reply-user">{{ reply.userName }} - {{ reply.replyTime }}</text>
-          <text class="reply-likes">Likes: {{ reply.likes }}</text>
+    <div class="replies">
+      <div class="reply-item" v-for="reply in replies" :key="reply.id">
+        <p class="reply-content">{{ reply.content }}</p>
+        <div class="spacer"></div>
+        <div class="reply-user-container">
+          <span class="reply-user">{{ reply.userName }} - {{ reply.replyTime }}</span>
+          <span class="reply-likes">Likes: {{ reply.likes }}</span>
           <button @click="toggleLikeReply(reply)" class="like-reply-btn">{{ likedReplies.includes(reply.id) ? 'Unlike' : 'Like' }}</button>
-          <text @click="deleteReply(reply.id)" v-if="reply.userName === $store.state.user.name" class="delete-reply-text">Delete</text>
-        </view>
-      </view>
-    </view>
+          <span @click="deleteReply(reply.id)" v-if="reply.userName === $store.state.user.name" class="delete-reply-text">Delete</span>
+        </div>
+        <div v-if="reply.fileUrl" class="reply-file">
+          <a href="#" @click="downloadFile(reply.fileUrl, reply.fileName)">{{ reply.fileName }}</a>
+        </div>
+      </div>
+    </div>
     <textarea v-model="newReplyContent" placeholder="填写回复"></textarea>
+    <el-upload
+      ref="upload"
+      :limit="1"
+      accept=".jpg,.png,.pdf,.docx"
+      :file-list="upload.fileList"
+      :action="upload.url"
+      :headers="upload.headers"
+      :on-change="handleFileChange"
+      :on-success="handleFileSuccess"
+      :on-progress="handleFileUploadProgress"
+      :auto-upload="false"
+      class="upload-container"
+    >
+      <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+      <el-button style="margin-left: 10px;" size="small" type="success" :loading="upload.isUploading" @click="submitUpload">上传文件</el-button>
+    </el-upload>
     <button @click="addReply" class="submit-btn">提交回复</button>
-  </view>
+  </div>
 </template>
 
 <script>
 import { getPostById, getRepliesByPostId, createReply, deletePostById, deleteReplyById, likePost, unlikePost, likeReply, unlikeReply, checkUserLikeStatus, checkUserReplyLikeStatus } from '@/api/forum'
+import { getToken } from '@/utils/auth'
 import { formatDateTime } from '@/api/OllamaApi.js'
+import uploadFile from '@/utils/upload'
+import axios from 'axios';
+import { saveAs } from 'file-saver';
 
 export default {
   data() {
@@ -41,7 +64,17 @@ export default {
       replies: [],
       newReplyContent: '',
       likedPost: false,
-      likedReplies: []
+      likedReplies: [],
+      upload: {
+        isUploading: false,
+        fileList: [],
+        url: '/common/upload', // 上传的 URL
+        headers: {
+          Authorization: "Bearer " + getToken()
+        }
+      },
+      fileUrl: null,
+      fileName: null
     }
   },
   methods: {
@@ -50,114 +83,190 @@ export default {
         postId: this.post.id,
         userName: this.$store.state.user.name,
         content: this.newReplyContent,
-        replyTime: formatDateTime(new Date())
+        replyTime: formatDateTime(new Date()),
+        fileUrl: this.fileUrl,
+        fileName: this.fileName
       }
       createReply(replyData).then(() => {
-        this.newReplyContent = '';
-        this.fetchReplies();
+        this.newReplyContent = ''
+        this.upload.fileList = []
+        this.fileUrl = null
+        this.fileName = null
+        this.fetchReplies()
       }).catch(error => {
-        console.error("Failed to create reply:", error);
-      });
+        console.error("Failed to create reply:", error)
+      })
     },
     deletePost() {
       if (confirm("确定删除帖子？")) {
         deletePostById(this.post.id, this.$store.state.user.name).then(() => {
-          this.$tab.navigateBack('/pages/Forum/index');
+          this.$router.push('/pages/Forum/index')
         }).catch(error => {
-          console.error("Failed to delete post:", error);
-        });
+          console.error("Failed to delete post:", error)
+        })
       }
     },
     deleteReply(replyId) {
       if (confirm("确定删除回复？")) {
         deleteReplyById(replyId).then(() => {
-          this.fetchReplies();
+          this.fetchReplies()
         }).catch(error => {
-          console.error("Failed to delete reply:", error);
-        });
+          console.error("Failed to delete reply:", error)
+        })
       }
     },
     toggleLikePost() {
       if (this.likedPost) {
         unlikePost(this.post.id, this.$store.state.user.name).then(() => {
-          this.likedPost = false;
-          this.fetchPost();
+          this.likedPost = false
+          this.fetchPost()
         }).catch(error => {
-          console.error("Error unliking post:", error);
-        });
+          console.error("Error unliking post:", error)
+        })
       } else {
         likePost(this.post.id, this.$store.state.user.name).then(() => {
-          this.likedPost = true;
-          this.fetchPost();
+          this.likedPost = true
+          this.fetchPost()
         }).catch(error => {
-          console.error("Error liking post:", error);
-        });
+          console.error("Error liking post:", error)
+        })
       }
     },
     toggleLikeReply(reply) {
       if (this.likedReplies.includes(reply.id)) {
         unlikeReply(reply.id, this.$store.state.user.name).then(() => {
-          this.likedReplies = this.likedReplies.filter(id => id !== reply.id);
-          this.fetchReplies();
+          this.likedReplies = this.likedReplies.filter(id => id !== reply.id)
+          this.fetchReplies()
         }).catch(error => {
-          console.error("Error unliking reply:", error);
-        });
+          console.error("Error unliking reply:", error)
+        })
       } else {
         likeReply(reply.id, this.$store.state.user.name).then(() => {
-          this.likedReplies.push(reply.id);
-          this.fetchReplies();
+          this.likedReplies.push(reply.id)
+          this.fetchReplies()
         }).catch(error => {
-          console.error("Error liking reply:", error);
-        });
+          console.error("Error liking reply:", error)
+        })
       }
     },
     fetchPost() {
-      const postId = this.$route.query.postId;
+      const postId = this.$route.query.postId
       getPostById(postId).then(response => {
-        this.post = response.data;
-        this.checkUserLikeStatus(postId);
+        this.post = response.data
+        this.checkUserLikeStatus(postId)
       }).catch(error => {
-        console.error("Failed to fetch post:", error);
-      });
+        console.error("Failed to fetch post:", error)
+      })
     },
     fetchReplies() {
-      const postId = this.$route.query.postId;
+      const postId = this.$route.query.postId
       getRepliesByPostId(postId).then(response => {
-        this.replies = response.data;
-        this.checkUserReplyLikeStatus();
+        this.replies = response.data
+        this.checkUserReplyLikeStatus()
       }).catch(error => {
-        console.error("Failed to fetch replies:", error);
-      });
+        console.error("Failed to fetch replies:", error)
+      })
     },
     fetchPostAndReplies() {
-      this.fetchPost();
-      this.fetchReplies();
+      this.fetchPost()
+      this.fetchReplies()
     },
     checkUserLikeStatus(postId) {
-      const userName = this.$store.state.user.name;
+      const userName = this.$store.state.user.name
       checkUserLikeStatus(postId, userName).then(response => {
-        this.likedPost = response.liked;
+        this.likedPost = response.liked
       }).catch(error => {
-        console.error("Failed to check user like status:", error);
-      });
+        console.error("Failed to check user like status:", error)
+      })
     },
     checkUserReplyLikeStatus() {
-      const userName = this.$store.state.user.name;
-	  
+      const userName = this.$store.state.user.name
       Promise.all(this.replies.map(reply => 
         checkUserReplyLikeStatus(reply.id, userName).then(response => {
-			
           if (response.liked) {
-            this.likedReplies.push(reply.id);
+            this.likedReplies.push(reply.id)
           }
         })
       )).catch(error => {
-        console.error("Failed to check user reply like status:", error);
-      });
+        console.error("Failed to check user reply like status:", error)
+      })
+    },
+    submitUpload() {
+      if (this.upload.fileList.length === 0) {
+        this.$message.warning('请先选择文件')
+        return
+      }
+
+      const file = this.upload.fileList[0].raw
+      const config = {
+        url: this.upload.url,
+        file: file,
+        name: 'file',
+        headers: this.upload.headers,
+        formData: {}
+      }
+
+      this.upload.isUploading = true
+
+      uploadFile(config)
+        .then(response => {
+			console.log(response)
+          this.upload.isUploading = false
+          this.$message.success('文件上传成功')
+          this.fileUrl = response.url
+          this.fileName = response.originalFilename
+          this.upload.fileList = [{
+            name: response.originalFilename,
+            url: response.url
+          }]
+        })
+        .catch(error => {
+          this.upload.isUploading = false
+          this.$message.error('文件上传失败')
+          console.error('上传失败的错误:', error)
+        })
+    },
+    handleFileUploadProgress(event, file, fileList) {
+      console.log('上传进度:', event.percent)
+    },
+    handleFileChange(file, fileList) {
+      this.upload.fileList = fileList
+    },
+    handleFileSuccess(response, file, fileList) {
+      console.log('上传成功:', response)
+    },
+    async downloadFile(fileUrl, fileName) {
+      var url = `http://localhost:8080/common/download?fileName=${encodeURIComponent(fileName)}&delete=false`
+      try {
+        const response = await axios({
+          method: 'get',
+          url: fileUrl,
+          responseType: 'blob',
+          headers: { 'Authorization': `Bearer ${getToken()}` }
+        });
+
+        // 提取文件名
+        const contentDisposition = response.headers['content-disposition'];
+        let actualFileName = fileName;
+        if (contentDisposition && contentDisposition.indexOf('attachment') !== -1) {
+          const matches = contentDisposition.match(/filename="(.+)"/);
+          if (matches && matches[1]) {
+            actualFileName = decodeURIComponent(matches[1]);
+          }
+        }
+
+        // 将blob转换为可下载的文件
+        const blob = new Blob([response.data]);
+        // 使用 file-saver 库保存文件
+        saveAs(blob, actualFileName);
+      } catch (error) {
+        console.error('下载文件时出错：', error);
+      }
     }
   },
+
   created() {
-    this.fetchPostAndReplies();
+    this.fetchPostAndReplies()
   }
 }
 </script>
@@ -282,7 +391,15 @@ textarea {
   height: 10px;
 }
 
+.upload-container {
+  margin-bottom: 20px;
+}
+
 .post-likes {
-	padding-left: 10px;
+  padding-left: 10px;
+}
+
+.reply-file {
+  margin-top: 10px;
 }
 </style>
