@@ -1,0 +1,100 @@
+<template>
+  <view>
+    <view class="header">
+      <view class="title">用户管理</view>
+      <button @click="handleAddUser">新增用户</button>
+    </view>
+    <view class="content">
+      <view class="table">
+        <view class="table-header">
+          <view class="table-cell">用户名</view>
+          <view class="table-cell">创建时间</view>
+          <view class="table-cell">是否管理员</view>
+          <view class="table-cell">操作</view>
+        </view>
+        <view v-for="user in userList" :key="user.userId" class="table-row">
+          <view class="table-cell">{{ user.userName }}</view>
+          <view class="table-cell">{{ user.createTime }}</view>
+          <view class="table-cell">{{ user.admin ? '是' : '否' }}</view>
+          <view class="table-cell">
+            <button @click="handleEditUser(user.userId)">编辑</button>
+            <button @click="handleDeleteUser(user.userId)">删除</button>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import { listUsers, deleteUser } from '@/api/user_control'
+
+export default {
+  data() {
+    return {
+      userList: []
+    }
+  },
+  onLoad() {
+    this.fetchUsers()
+  },
+  methods: {
+    fetchUsers() {
+      listUsers().then(response => {
+        this.userList = response.rows
+      })
+    },
+    handleAddUser() {
+      // 跳转到新增用户页面
+      uni.navigateTo({
+        url: '/pages/user_management/add_user'
+      })
+    },
+    handleEditUser(userId) {
+      // 跳转到编辑用户页面
+      uni.navigateTo({
+        url: '/pages/user_management/edit_user?userId=' + userId
+      })
+    },
+    handleDeleteUser(userId) {
+      deleteUser([userId]).then(() => {
+        this.fetchUsers()
+      })
+    }
+  }
+}
+</script>
+
+<style scoped>
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+}
+.title {
+  font-size: 20px;
+}
+.content {
+  padding: 10px;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table-header, .table-row {
+  display: flex;
+  border-bottom: 1px solid #ccc;
+}
+.table-cell {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+}
+.table-header {
+  background-color: #f5f5f5;
+}
+.table-cell button {
+  margin: 0 5px;
+}
+</style>

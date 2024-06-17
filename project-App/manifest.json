@@ -1,6 +1,6 @@
 {
-    "name" : "手机问答系统",
-    "appid" : "__UNI__DEB750A",
+    "name" : "知识库问答系统",
+    "appid" : "__UNI__2D9C02C",
     "description" : "",
     "versionName" : "1.1.0",
     "versionCode" : "100",
@@ -14,7 +14,10 @@
             "autoclose" : true,
             "delay" : 0
         },
-        "modules" : {},
+        "modules" : {
+            "OAuth" : {},
+            "Share" : {}
+        },
         "distribute" : {
             "android" : {
                 "permissions" : [
@@ -39,7 +42,9 @@
                 "dSYMs" : false
             },
             "sdkConfigs" : {
-                "ad" : {}
+                "ad" : {},
+                "oauth" : {},
+                "share" : {}
             }
         }
     },

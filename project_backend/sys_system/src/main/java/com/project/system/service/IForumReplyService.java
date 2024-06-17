@@ -10,4 +10,6 @@ public interface IForumReplyService {
     void likeReply(Long replyId, String userName);
     void unlikeReply(Long replyId, String userName);
     boolean checkUserLikeStatus(Long replyId, String userName);
+
+    ForumReply selectReplyById(Long replyId);
 }

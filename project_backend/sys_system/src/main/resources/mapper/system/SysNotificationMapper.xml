@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.system.mapper.SysNotificationMapper">
+
+    <resultMap id="SysNotificationResultMap" type="com.project.system.domain.SysNotification">
+        <id property="id" column="id"/>
+        <result property="userName" column="user_name"/>
+        <result property="content" column="content"/>
+        <result property="postId" column="post_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="isRead" column="is_read"/>
+        <result property="replyId" column="reply_id"/>
+    </resultMap>
+
+    <select id="selectNotificationList" parameterType="String" resultMap="SysNotificationResultMap">
+        SELECT id, user_name, content, post_id, create_time, is_read, reply_id
+        FROM sys_notification
+        WHERE user_name = #{userName}
+    </select>
+
+    <select id="selectNotificationById" parameterType="Long" resultMap="SysNotificationResultMap">
+        SELECT id, user_name, content, post_id, create_time, is_read
+        FROM sys_notification
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insertNotification" parameterType="com.project.system.domain.SysNotification">
+        INSERT INTO sys_notification (user_name, content, post_id, create_time, is_read, reply_id)
+        VALUES (#{userName}, #{content}, #{postId}, #{createTime}, #{isRead}, #{replyId})
+    </insert>
+
+    <update id="updateNotification" parameterType="com.project.system.domain.SysNotification">
+        UPDATE sys_notification
+        SET content = #{content}, post_id = #{postId}, is_read = #{isRead}, reply_id = #{replyId}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteNotificationByIds" parameterType="Long[]">
+        DELETE FROM sys_notification
+        WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <update id="markNotificationAsRead" parameterType="Long">
+        UPDATE sys_notification
+        SET is_read = TRUE
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteNotificationByUserNameAndPostId" parameterType="com.project.system.domain.SysNotification">
+        DELETE FROM sys_notification
+        WHERE user_name = #{userName} AND post_id = #{postId}
+    </delete>
+
+    <delete id="deleteNotificationByPostId" parameterType="map">
+        DELETE FROM sys_notification
+        WHERE post_id = #{postId}
+    </delete>
+
+    <delete id="deleteNotificationByUserNameAndReplyId" parameterType="com.project.system.domain.SysNotification">
+        DELETE FROM sys_notification
+        WHERE user_name = #{userName} AND reply_id = #{replyId}
+    </delete>
+
+    <delete id="deleteNotificationByReplyId" parameterType="map">
+        DELETE FROM sys_notification
+        WHERE reply_id = #{replyId}
+    </delete>
+
+</mapper>
