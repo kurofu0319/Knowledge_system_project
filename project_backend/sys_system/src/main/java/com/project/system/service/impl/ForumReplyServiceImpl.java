@@ -62,4 +62,9 @@ public class ForumReplyServiceImpl implements IForumReplyService {
     public boolean checkUserLikeStatus(Long replyId, String userName) {
         return forumReplyMapper.checkUserLikeStatus(userName, replyId);
     }
+
+    @Override
+    public ForumReply selectReplyById(Long replyId) {
+        return forumReplyMapper.selectReplyById(replyId);
+    }
 }

@@ -105,6 +105,41 @@
   	{
   		"navigationBarTitleText" : "帖子详情"
   	}
+  },
+  {
+  	"path" : "pages/user_management/index",
+  	"style" : 
+  	{
+  		"navigationBarTitleText" : "用户信息"
+  	}
+  },
+  {
+  	"path" : "pages/user_management/add_user",
+  	"style" : 
+  	{
+  		"navigationBarTitleText" : "新增用户"
+  	}
+  },
+  {
+  	"path" : "pages/user_management/edit_user",
+  	"style" : 
+  	{
+  		"navigationBarTitleText" : "编辑用户"
+  	}
+  },
+  {
+  	"path" : "pages/notice_management/index",
+  	"style" : 
+  	{
+  		"navigationBarTitleText" : "通知公告"
+  	}
+  },
+  {
+  	"path" : "pages/notice_management/add",
+  	"style" : 
+  	{
+  		"navigationBarTitleText" : "新增公告"
+  	}
   }],
   "tabBar": {
     "color": "#000000",

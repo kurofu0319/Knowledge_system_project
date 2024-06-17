@@ -23,7 +23,7 @@
         SELECT id, post_id, user_name, content, reply_time, likes, file_url, file_name FROM forum_reply WHERE id = #{id}
     </select>
 
-    <insert id="insertReply" parameterType="com.project.system.domain.ForumReply">
+    <insert id="insertReply" parameterType="com.project.system.domain.ForumReply" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO forum_reply (post_id, user_name, content, reply_time, likes, file_url, file_name)
         VALUES (#{postId}, #{userName}, #{content}, #{replyTime}, #{likes}, #{fileUrl}, #{fileName})
     </insert>

@@ -76,13 +76,14 @@
 		    <text class="text">论坛</text>
 		  </view>
 		</uni-grid-item>
-		<uni-grid-item :index="4">
+		 <!-- 仅管理员可见 -->
+		<uni-grid-item v-if="isAdmin":index="4">
 		  <view class="grid-item-box">
 		    <uni-icons type="person-filled" size="30"></uni-icons>
 		    <text class="text">用户管理</text>
 		  </view>
 		</uni-grid-item>
-		<uni-grid-item :index="4">
+		<uni-grid-item v-if="isAdmin":index="5">
 		  <view class="grid-item-box">
 		    <uni-icons type="person-filled" size="30"></uni-icons>
 		    <text class="text">论坛管理</text>
@@ -101,6 +102,7 @@
 </template>
 
 <script>
+	import {getUserProfile} from '@/api/system/user'
   export default {
     data() {
       return {
@@ -112,9 +114,24 @@
           { image: '/static/images/banner/banner03.png' },
 		  { image: '/static/images/banner/banner04.png' }
         ],
+		isAdmin: false,
       };
     },
+	onLoad(){
+		this.checkAdmin()
+      },
+
     methods: {
+	  async checkAdmin() {
+	        try {
+	          const response = await getUserProfile();
+	          console.log(response);
+	          const user = response.data;
+	          this.isAdmin = user.roles.some(role => role.roleKey === 'admin');
+	        } catch (error) {
+	          console.error('Error fetching user profile:', error);
+	        }
+	      },
       clickBannerItem(item) {
         console.info(item);
       },
@@ -129,8 +146,14 @@
 		  if (e.detail.index === 1) {
 		    this.$tab.navigateTo('/pages/history/index'); // 跳转到历史记录页面
 		  }
+		  if (e.detail.index === 2) {
+		    this.$tab.navigateTo('/pages/notice_management/index'); // 跳转到历史记录页面
+		  }
 		  if (e.detail.index === 3) {
 		    this.$tab.navigateTo('/pages/Forum/index'); // 跳转到论坛首页
+		  }
+		  if (e.detail.index === 4) {
+		    this.$tab.navigateTo('/pages/user_management/index'); // 跳转到论坛首页
 		  }
         
       },

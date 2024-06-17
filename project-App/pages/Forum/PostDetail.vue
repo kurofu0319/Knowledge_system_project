@@ -53,7 +53,7 @@
 import { getPostById, getRepliesByPostId, createReply, deletePostById, deleteReplyById, likePost, unlikePost, likeReply, unlikeReply, checkUserLikeStatus, checkUserReplyLikeStatus } from '@/api/forum'
 import { getToken } from '@/utils/auth'
 import { formatDateTime } from '@/api/OllamaApi.js'
-import uploadFile from '@/utils/upload'
+import uploadFile from '@/utils/uploadFiles'
 import axios from 'axios';
 import { saveAs } from 'file-saver';
 
