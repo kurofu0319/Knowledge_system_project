@@ -2,30 +2,39 @@
   <div class="post-detail-container">
     <div class="post-header">
       <h1 class="post-title">{{ post.title }}</h1>
+      <div class="delete-post-btn" @click="deletePost" v-if="post.userName === $store.state.user.name">
+        <i class="fas fa-trash-alt"></i>
+      </div>
       <div class="spacer"></div>
       <p class="post-content">{{ post.content }}</p>
       <div class="spacer"></div>
       <div class="post-user-container">
-        <span class="post-user">{{ post.userName }} - {{ post.postTime }}</span>
-        &nbsp;
-        <span class="post-likes">Likes: {{ post.likes }}</span>
-        <button @click="toggleLikePost" class="like-btn">{{ likedPost ? 'Unlike' : 'Like' }}</button>
+        <span class="post-user" @click="navigateToUserInfo(post.userId)">{{ post.userName }} - {{ post.postTime }}</span>
+        <span class="post-likes">
+          <i :class="['fas', 'fa-heart', { liked: likedPost }]" @click="toggleLikePost"></i>
+          <span class="like-count">{{ post.likes }}</span>
+        </span>
       </div>
+      <hr class="post-reply-divider"/>
     </div>
-    <button @click="deletePost" v-if="post.userName === $store.state.user.name" class="delete-post-btn">删除帖子</button>
     <div class="replies">
       <div class="reply-item" v-for="reply in replies" :key="reply.id">
+        <div class="delete-reply-btn" @click="deleteReply(reply.id)" v-if="reply.userName === $store.state.user.name">
+          <i class="fas fa-trash-alt"></i>
+        </div>
         <p class="reply-content">{{ reply.content }}</p>
         <div class="spacer"></div>
         <div class="reply-user-container">
-          <span class="reply-user">{{ reply.userName }} - {{ reply.replyTime }}</span>
-          <span class="reply-likes">Likes: {{ reply.likes }}</span>
-          <button @click="toggleLikeReply(reply)" class="like-reply-btn">{{ likedReplies.includes(reply.id) ? 'Unlike' : 'Like' }}</button>
-          <span @click="deleteReply(reply.id)" v-if="reply.userName === $store.state.user.name" class="delete-reply-text">Delete</span>
+          <span class="reply-user" @click="navigateToUserInfo(reply.userId)">{{ reply.userName }} - {{ reply.replyTime }}</span>
+          <span class="reply-likes">
+            <i :class="['fas', 'fa-heart', { liked: likedReplies.includes(reply.id) }]" @click="toggleLikeReply(reply)"></i>
+            <span class="like-count">{{ reply.likes }}</span>
+          </span>
         </div>
         <div v-if="reply.fileUrl" class="reply-file">
           <a href="#" @click="downloadFile(reply.fileUrl, reply.fileName)">{{ reply.fileName }}</a>
         </div>
+        <hr class="reply-divider"/>
       </div>
     </div>
     <textarea v-model="newReplyContent" placeholder="填写回复"></textarea>
@@ -210,7 +219,6 @@ export default {
 
       uploadFile(config)
         .then(response => {
-			console.log(response)
           this.upload.isUploading = false
           this.$message.success('文件上传成功')
           this.fileUrl = response.url
@@ -233,173 +241,134 @@ export default {
       this.upload.fileList = fileList
     },
     handleFileSuccess(response, file, fileList) {
-      console.log('上传成功:', response)
+      console.log('上传成功的响应:', response)
     },
-    async downloadFile(fileUrl, fileName) {
-      var url = `http://localhost:8080/common/download?fileName=${encodeURIComponent(fileName)}&delete=false`
-      try {
-        const response = await axios({
-          method: 'get',
-          url: fileUrl,
-          responseType: 'blob',
-          headers: { 'Authorization': `Bearer ${getToken()}` }
-        });
-
-        // 提取文件名
-        const contentDisposition = response.headers['content-disposition'];
-        let actualFileName = fileName;
-        if (contentDisposition && contentDisposition.indexOf('attachment') !== -1) {
-          const matches = contentDisposition.match(/filename="(.+)"/);
-          if (matches && matches[1]) {
-            actualFileName = decodeURIComponent(matches[1]);
-          }
-        }
-
-        // 将blob转换为可下载的文件
-        const blob = new Blob([response.data]);
-        // 使用 file-saver 库保存文件
-        saveAs(blob, actualFileName);
-      } catch (error) {
-        console.error('下载文件时出错：', error);
-      }
+    downloadFile(url, fileName) {
+      axios({
+        method: 'get',
+        url: url,
+        responseType: 'blob'
+      }).then(response => {
+        saveAs(response.data, fileName)
+      }).catch(error => {
+        console.error('下载文件失败:', error)
+      })
+    },
+    navigateToUserInfo(userId) {
+      this.$router.push(`/pages/mine/info/index?userId=${userId}`)
     }
   },
-
-  created() {
+  mounted() {
     this.fetchPostAndReplies()
   }
 }
 </script>
 
-<style lang="scss">
+<style scoped>
 .post-detail-container {
+  margin: 20px;
   padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #fff;
 }
 
 .post-header {
-  background-color: #f9f9f9;
-  padding: 15px;
-  border-radius: 5px;
+  position: relative;
   margin-bottom: 20px;
 }
 
 .post-title {
-  font-size: 24px;
+  font-size: 1.6em;
   font-weight: bold;
-  word-break: break-word;
-}
-
-.post-content {
-  font-size: 18px;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-.post-user-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.post-user {
-  font-size: 14px;
-  color: #666;
-}
-
-.post-likes {
-  font-size: 14px;
-  color: #666;
-}
-
-.like-btn {
-  background-color: #007bff;
-  color: white;
-  padding: 5px;
-  border-radius: 5px;
-  font-size: 12px;
-  cursor: pointer;
-  margin-left: 10px;
-}
-
-.replies {
-  margin-top: 20px;
-}
-
-.reply-item {
-  padding: 10px;
-  border-bottom: 1px solid #ccc;
-}
-
-.reply-content {
-  font-size: 16px;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-.reply-user-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.reply-user {
-  font-size: 14px;
-  color: #666;
-}
-
-.reply-likes {
-  font-size: 14px;
-  padding-left: 10px;
-  color: #666;
-}
-
-.like-reply-btn {
-  background-color: #007bff;
-  color: white;
-  padding: 5px;
-  border-radius: 5px;
-  font-size: 12px;
-  cursor: pointer;
-  margin-left: 10px;
-}
-
-textarea {
-  width: 100%;
   margin-bottom: 10px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.submit-btn, .delete-post-btn {
-  background-color: #007bff;
-  color: white;
-  padding: 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  border: none;
-}
-
-.delete-reply-text {
-  color: #ff0000;
-  cursor: pointer;
-  font-size: 14px;
-  text-decoration: underline;
 }
 
 .spacer {
   height: 10px;
 }
 
+.post-content {
+  margin-bottom: 10px;
+}
+
+.post-user-container, .reply-user-container {
+  display: flex;
+  align-items: center;
+}
+
+.post-user, .reply-user {
+  font-size: 0.9em;
+  color: #666;
+  cursor: pointer; /* 增加点击手型指针 */
+}
+
+.post-likes, .reply-likes {
+  margin-left: 10px; /* 调整位置 */
+  display: flex;
+  align-items: center;
+}
+
+.post-likes i, .reply-likes i {
+  cursor: pointer;
+  font-size: 1em; /* 调整大小 */
+  margin-left: 5px;
+}
+
+.like-count {
+  margin-left: 10px; /* 增大距离 */
+}
+
+.liked {
+  color: red;
+}
+
+.delete-post-btn, .delete-reply-btn {
+  position: absolute;
+  top: 5px;
+  right: 10px; /* 调整位置 */
+  color: #1E90FF;
+  cursor: pointer;
+  font-size: 1em; /* 调整大小 */
+}
+
+.reply-item {
+  position: relative;
+}
+
+.post-reply-divider {
+  border: 1px solid black;
+  margin: 10px 0;
+}
+
+.reply-divider {
+  border: 1px solid grey;
+  margin: 10px 0;
+}
+
+textarea {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1em;
+}
+
+.submit-btn {
+  padding: 10px 20px;
+  border: none;
+  background-color: green;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
 .upload-container {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
-.post-likes {
-  padding-left: 10px;
-}
-
-.reply-file {
-  margin-top: 10px;
+.reply-file a {
+  font-size: 0.8em; /* 调整文件链接字体大小 */
 }
 </style>

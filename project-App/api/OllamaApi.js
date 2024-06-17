@@ -9,7 +9,7 @@ export async function generateOllamaCompletion(prompt) {
     const response = await axios.post(
       `${OLLAMA_API_URL}/api/generate`,
       {
-        model: 'qwen:7b',
+        model: 'qwen:4b',
         prompt: prompt,
         stream: false
       },

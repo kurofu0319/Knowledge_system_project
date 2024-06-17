@@ -3,6 +3,7 @@ import App from './App'
 import store from './store' // store
 import plugins from './plugins' // plugins
 import './permission' // permission
+import '@fortawesome/fontawesome-free/css/all.min.css' //Font Awesome
 
 // 引入 Element UI 和样式
 import ElementUI from 'element-ui'
