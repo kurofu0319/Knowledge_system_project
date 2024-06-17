@@ -44,7 +44,7 @@ export default {
 
     // 查询搜索历史记录
     const response = await getUserSearchHistory(userName);
-    this.searchHistory = response.data.slice(0, 10); // 显示最近十条记录
+    this.searchHistory = response.data.slice(0, 100); // 显示最近十条记录
   },
 };
 </script>

@@ -1,6 +1,6 @@
 <template>
   <view class="content">
-    <image class="logo" src="@/static/系统图标.png"></image>
+    <image class="logo" src="@/static/logo200.png"></image>
     <view class="text-area">
       <text class="title">知识库问答系统</text>
     </view>
