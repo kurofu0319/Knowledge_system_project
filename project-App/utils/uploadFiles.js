@@ -1,9 +1,8 @@
 import axios from 'axios'
 import { getToken } from '@/utils/auth'
 import errorCode from '@/utils/errorCode'
-import { Message } from 'element-ui'
 
-const baseURL = 'http://localhost:8080' // 设置后端地址
+const baseURL = 'http://192.168.43.23:8080' // 设置后端地址
 
 const uploadFile = config => {
   return new Promise((resolve, reject) => {
@@ -30,16 +29,23 @@ const uploadFile = config => {
       if (code === 200) {
         resolve(result)
       } else if (code === 401) {
-        Message.confirm("登录状态已过期，您可以继续留在该页面，或者重新登录?").then(res => {
-          if (res.confirm) {
-            store.dispatch('LogOut').then(() => {
-              location.reload()
-            })
+        uni.showModal({
+          title: '登录状态已过期',
+          content: '您可以继续留在该页面，或者重新登录?',
+          success: res => {
+            if (res.confirm) {
+              store.dispatch('LogOut').then(() => {
+                location.reload()
+              })
+            }
           }
         })
         reject('无效的会话，或者会话已过期，请重新登录。')
       } else {
-        Message.error(msg)
+        uni.showToast({
+          title: msg,
+          icon: 'none'
+        })
         reject(code)
       }
     })
@@ -55,7 +61,10 @@ const uploadFile = config => {
       } else if (message.includes('Request failed with status code')) {
         message = '系统接口' + message.substr(message.length - 3) + '异常'
       }
-      Message.error(message)
+      uni.showToast({
+        title: message,
+        icon: 'none'
+      })
       reject(error)
     })
   })

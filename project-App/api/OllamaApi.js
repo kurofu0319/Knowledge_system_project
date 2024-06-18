@@ -1,7 +1,7 @@
 import axios from 'axios';
 import request from '@/utils/request';
 
-const OLLAMA_API_URL = 'http://localhost:11434';
+const OLLAMA_API_URL = 'http://192.168.43.23:11434';
 
 // 调用 Ollama API 生成补全
 export async function generateOllamaCompletion(prompt) {
@@ -9,7 +9,7 @@ export async function generateOllamaCompletion(prompt) {
     const response = await axios.post(
       `${OLLAMA_API_URL}/api/generate`,
       {
-        model: 'qwen:4b',
+        model: 'qwen:7b',
         prompt: prompt,
         stream: false
       },

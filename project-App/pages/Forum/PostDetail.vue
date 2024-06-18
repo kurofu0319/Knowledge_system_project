@@ -38,22 +38,22 @@
       </div>
     </div>
     <textarea v-model="newReplyContent" placeholder="填写回复"></textarea>
-    <el-upload
-      ref="upload"
-      :limit="1"
-      accept=".jpg,.png,.pdf,.docx"
-      :file-list="upload.fileList"
-      :action="upload.url"
-      :headers="upload.headers"
-      :on-change="handleFileChange"
-      :on-success="handleFileSuccess"
-      :on-progress="handleFileUploadProgress"
-      :auto-upload="false"
-      class="upload-container"
-    >
-      <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
-      <el-button style="margin-left: 10px;" size="small" type="success" :loading="upload.isUploading" @click="submitUpload">上传文件</el-button>
-    </el-upload>
+    <view class="upload-img">
+      <uni-file-picker 
+        ref="files"
+        v-model="fileList"
+        :auto-upload="false"
+        file-mediatype="all"
+        @select="selectUpload"
+        @progress="handleFileUploadProgress"
+        @success="uploadSuccess"
+        @fail="uploadFail"
+        :list-styles="listStyles"
+      >
+        <button>点击上传</button>
+      </uni-file-picker>
+    </view>
+    <uni-button @click="submitUpload" type="primary" :loading="upload.isUploading">上传文件</uni-button>
     <button @click="addReply" class="submit-btn">提交回复</button>
   </div>
 </template>
@@ -62,9 +62,7 @@
 import { getPostById, getRepliesByPostId, createReply, deletePostById, deleteReplyById, likePost, unlikePost, likeReply, unlikeReply, checkUserLikeStatus, checkUserReplyLikeStatus } from '@/api/forum'
 import { getToken } from '@/utils/auth'
 import { formatDateTime } from '@/api/OllamaApi.js'
-import uploadFile from '@/utils/uploadFiles'
 import axios from 'axios';
-import { saveAs } from 'file-saver';
 
 export default {
   data() {
@@ -77,13 +75,21 @@ export default {
       upload: {
         isUploading: false,
         fileList: [],
-        url: '/common/upload', // 上传的 URL
+        url: 'http://192.168.43.23:8080/common/upload', // 自定义上传的 URL
         headers: {
           Authorization: "Bearer " + getToken()
         }
       },
       fileUrl: null,
-      fileName: null
+      fileName: null,
+      fileList: [],
+      listStyles: {
+        "borderStyle": {
+          "width": "0", // 边框宽度
+        },
+        "border": false, // 是否显示边框
+        "dividline": false
+      }
     }
   },
   methods: {
@@ -201,61 +207,127 @@ export default {
       })
     },
     submitUpload() {
-      if (this.upload.fileList.length === 0) {
-        this.$message.warning('请先选择文件')
-        return
+      const files = this.upload.fileList;
+      if (files.length === 0) {
+        uni.showToast({
+          title: '请先选择文件',
+          icon: 'none'
+        });
+        return;
       }
 
-      const file = this.upload.fileList[0].raw
-      const config = {
-        url: this.upload.url,
-        file: file,
-        name: 'file',
-        headers: this.upload.headers,
-        formData: {}
-      }
-
-      this.upload.isUploading = true
-
-      uploadFile(config)
-        .then(response => {
-          this.upload.isUploading = false
-          this.$message.success('文件上传成功')
-          this.fileUrl = response.url
-          this.fileName = response.originalFilename
-          this.upload.fileList = [{
-            name: response.originalFilename,
-            url: response.url
-          }]
-        })
-        .catch(error => {
-          this.upload.isUploading = false
-          this.$message.error('文件上传失败')
-          console.error('上传失败的错误:', error)
-        })
+      files.forEach(file => {
+        const formData = new FormData();
+        formData.append('file', file.file);
+        formData.append('name', file.name);
+        
+        axios.post(this.upload.url, formData, {
+          headers: this.upload.headers
+        }).then(response => {
+          uni.showToast({
+            title: '文件上传成功',
+            icon: 'success'
+          });
+          this.uploadSuccess(response);
+        }).catch(error => {
+          uni.showToast({
+            title: '文件上传失败',
+            icon: 'none'
+          });
+          this.uploadFail(error);
+        });
+      });
     },
-    handleFileUploadProgress(event, file, fileList) {
-      console.log('上传进度:', event.percent)
+    handleFileUploadProgress(event) {
+      console.log('上传进度:', event)
     },
-    handleFileChange(file, fileList) {
-      this.upload.fileList = fileList
+    handleFileChange(event) {
+      this.upload.fileList = event.tempFiles;
     },
-    handleFileSuccess(response, file, fileList) {
-      console.log('上传成功的响应:', response)
+    handleFileSuccess(event) {
+      console.log('上传成功的响应:', event)
     },
-    downloadFile(url, fileName) {
+downloadFile(url, fileName) {
+    // 在H5环境中
+    if (typeof plus === 'undefined') {
       axios({
         method: 'get',
         url: url,
         responseType: 'blob'
       }).then(response => {
-        saveAs(response.data, fileName)
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(response.data);
+        link.download = fileName || 'file'; // 使用提供的文件名或默认为'file'
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href); // 释放URL
+
+        uni.showToast({
+          title: '下载成功',
+          icon: 'success'
+        });
+        console.log('文件已下载并保存');
       }).catch(error => {
-        console.error('下载文件失败:', error)
-      })
-    },
+        uni.showToast({
+          title: '下载失败',
+          icon: 'none'
+        });
+        console.error('下载文件失败：', error);
+      });
+    } else { // 在App环境中
+      this.plusDownloadFile(url, fileName);
+    }
+  },
+  plusDownloadFile(url, fileName) {
+    uni.showLoading({
+      title: '下载中'
+    });
+
+    let dtask = plus.downloader.createDownload(url, {
+      filename: "file://storage/emulated/0/" + "project-App/" + (fileName || 'file') // 保存路径，重命名文件
+    }, (d, status) => {
+      uni.hideLoading();
+      if (status == 200) {
+        uni.showToast({
+          title: '下载成功',
+          icon: 'success'
+        });
+        console.log('文件存储路径：' + d.filename);
+        // 可选：打开文件
+        // plus.runtime.openFile(d.filename, {}, (e) => {
+        //   console.log('打开文件成功');
+        // }, (e) => {
+        //   console.log('打开文件失败：' + e.message);
+        // });
+      } else {
+        uni.showToast({
+          title: '下载失败，请稍后重试',
+          icon: 'none'
+        });
+        console.error('下载文件失败：', status);
+        plus.downloader.clear();
+      }
+    });
+
+    dtask.start();
+  },
+
     navigateToUserInfo(userId) {
-      this.$router.push(`/pages/mine/info/index?userId=${userId}`)
+      this.$tab.redirectTo(`/pages/mine/info/index?userId=${userId}`)
+    },
+    selectUpload(e) {
+      console.log('选择文件：', e)
+      this.upload.fileList = e.tempFiles;
+    },
+    uploadSuccess(e) {
+      console.log('上传成功', e);
+      this.fileUrl = e.data.url; // 假设服务器返回的URL在response.data.url中
+      this.fileName = e.data.originalFilename; // 假设服务器返回的原始文件名在response.data.originalFilename中
+    },
+    uploadFail(e) {
+      console.log('上传失败：', e);
     }
   },
   mounted() {

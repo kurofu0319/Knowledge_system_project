@@ -3,14 +3,12 @@ import App from './App'
 import store from './store' // store
 import plugins from './plugins' // plugins
 import './permission' // permission
-import '@fortawesome/fontawesome-free/css/all.min.css' //Font Awesome
+ // Font Awesome
 
-// 引入 Element UI 和样式
-import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-chalk/index.css'
+// 引入并注册 Uni-UI 组件
+import { uniButton, uniFilePicker } from '@dcloudio/uni-ui'
 
-// 使用 Element UI 组件库
-Vue.use(ElementUI)
+Vue.component('uni-file-picker', uniFilePicker)
 
 Vue.use(plugins)
 
