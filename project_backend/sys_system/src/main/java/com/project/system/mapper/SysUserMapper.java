@@ -124,4 +124,8 @@ public interface SysUserMapper
      * @return 结果
      */
     SysUser checkEmailUnique(String email);
+
+    int updateUserNameAndNickName(@Param("userId") Long userId, @Param("nickName") String nickName);
+
+    SysUser selectEveryUserByUserName(String UserName);
 }

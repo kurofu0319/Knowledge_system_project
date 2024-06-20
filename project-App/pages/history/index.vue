@@ -27,8 +27,10 @@
   </view>
 </template>
 
+
 <script>
 import { getUserSearchHistory } from 'api/OllamaApi';
+import { getprofileByuserName } from 'api/system/user';
 import { getInfo } from '../../api/login';
 
 export default {
@@ -44,10 +46,12 @@ export default {
 
     // 查询搜索历史记录
     const response = await getUserSearchHistory(userName);
-    this.searchHistory = response.data.slice(0, 100); // 显示最近十条记录
+    const sortedHistory = response.data.sort((a, b) => new Date(b.searchTime) - new Date(a.searchTime)); // 按时间排序
+    this.searchHistory = sortedHistory.slice(0, 100); // 显示最近一百条记录
   },
 };
 </script>
+
 
 <style lang="scss">
 /* 样式根据需求调整 */
@@ -75,3 +79,4 @@ th {
   text-align: left;
 }
 </style>
+

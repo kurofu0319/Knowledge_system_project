@@ -140,6 +140,27 @@
   	{
   		"navigationBarTitleText" : "新增公告"
   	}
+  },
+  {
+  	"path" : "pages/forum_control/index",
+  	"style" : 
+  	{
+  		"navigationBarTitleText" : "论坛管理"
+  	}
+  },
+  {
+  	"path" : "pages/forum_control/detail",
+  	"style" : 
+  	{
+  		"navigationBarTitleText" : "论坛知识库"
+  	}
+  },
+  {
+  	"path" : "pages/userFile/index",
+  	"style" : 
+  	{
+  		"navigationBarTitleText" : "个人知识库"
+  	}
   }],
   "tabBar": {
     "color": "#000000",

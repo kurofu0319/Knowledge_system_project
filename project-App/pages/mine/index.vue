@@ -88,6 +88,7 @@
     },
     computed: {
       avatar() {
+		
         return this.$store.state.user.avatar
       },
       windowHeight() {

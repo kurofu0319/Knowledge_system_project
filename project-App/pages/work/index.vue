@@ -15,169 +15,143 @@
     <uni-section title="系统管理" type="line"></uni-section>
     <view class="grid-body">
       <uni-grid :column="3" :showBorder="false" @change="changeGrid">
-        
-<!--        <uni-grid-item :index="1">
-          <view class="grid-item-box">
-            <uni-icons type="staff-filled" size="30"></uni-icons>
-            <text class="text">角色管理</text>
-          </view>
-        </uni-grid-item> -->
         <uni-grid-item :index="0">
           <view class="grid-item-box">
             <uni-icons type="search" size="30"></uni-icons>
             <text class="text">搜索页面</text>
           </view>
         </uni-grid-item>
-		<uni-grid-item :index="1">
-		  <view class="grid-item-box">
-		    <uni-icons type="calendar-filled" size="30"></uni-icons>
-		    <text class="text">历史记录</text>
-		  </view>
-		</uni-grid-item>
-<!--        <uni-grid-item :index="3">
+        <uni-grid-item :index="1">
           <view class="grid-item-box">
-            <uni-icons type="color" size="30"></uni-icons>
-            <text class="text">菜单管理</text>
-          </view>
-        </uni-grid-item> -->
-<!--        <uni-grid-item :index="4">
-          <view class="grid-item-box">
-            <uni-icons type="settings-filled" size="30"></uni-icons>
-            <text class="text">部门管理</text>
+            <uni-icons type="calendar-filled" size="30"></uni-icons>
+            <text class="text">历史记录</text>
           </view>
         </uni-grid-item>
-        <uni-grid-item :index="5">
-          <view class="grid-item-box">
-            <uni-icons type="heart-filled" size="30"></uni-icons>
-            <text class="text">岗位管理</text>
-          </view>
-        </uni-grid-item> -->
-<!--        <uni-grid-item :index="6">
-          <view class="grid-item-box">
-            <uni-icons type="bars" size="30"></uni-icons>
-            <text class="text">字典管理</text>
-          </view>
-        </uni-grid-item>
-        <uni-grid-item :index="7">
-          <view class="grid-item-box">
-            <uni-icons type="gear-filled" size="30"></uni-icons>
-            <text class="text">参数设置</text>
-          </view>
-        </uni-grid-item> -->
         <uni-grid-item :index="2">
           <view class="grid-item-box">
             <uni-icons type="chat-filled" size="30"></uni-icons>
             <text class="text">通知公告</text>
+            <view v-if="unreadCount > 0" class="badge">{{ unreadCount }}</view>
           </view>
         </uni-grid-item>
-		<uni-grid-item :index="3">
-		  <view class="grid-item-box">
-		    <uni-icons type="chat-filled" size="30"></uni-icons>
-		    <text class="text">论坛</text>
-		  </view>
-		</uni-grid-item>
-		 <!-- 仅管理员可见 -->
-		<uni-grid-item v-if="isAdmin":index="4">
-		  <view class="grid-item-box">
-		    <uni-icons type="person-filled" size="30"></uni-icons>
-		    <text class="text">用户管理</text>
-		  </view>
-		</uni-grid-item>
-		<uni-grid-item v-if="isAdmin":index="5">
-		  <view class="grid-item-box">
-		    <uni-icons type="person-filled" size="30"></uni-icons>
-		    <text class="text">论坛管理</text>
-		  </view>
-		</uni-grid-item>
-<!--        <uni-grid-item :index="9">
+        <uni-grid-item :index="3">
           <view class="grid-item-box">
-            <uni-icons type="wallet-filled" size="30"></uni-icons>
-            <text class="text">日志管理</text>
+            <uni-icons type="chatboxes-filled" size="30"></uni-icons>
+            <text class="text">论坛</text>
           </view>
-        </uni-grid-item> -->
-        
+        </uni-grid-item>
+         <!-- 仅管理员可见 -->
+        <uni-grid-item v-if="isAdmin" :index="4">
+          <view class="grid-item-box">
+            <uni-icons type="staff-filled" size="30"></uni-icons>
+            <text class="text">用户管理</text>
+          </view>
+        </uni-grid-item>
+        <uni-grid-item v-if="isAdmin" :index="5">
+          <view class="grid-item-box">
+            <uni-icons type="pyq" size="30"></uni-icons>
+            <text class="text">论坛管理</text>
+          </view>
+        </uni-grid-item>
+		<uni-grid-item :index="6">
+		  <view class="grid-item-box">
+		    <uni-icons type="home-filled" size="30"></uni-icons>
+		    <text class="text">个人知识库</text>
+		  </view>
+		</uni-grid-item>
       </uni-grid>
     </view>
   </view>
 </template>
 
 <script>
-	import {getUserProfile} from '@/api/system/user'
-  export default {
-    data() {
-      return {
-        current: 0,
-        swiperDotIndex: 0,
-        data: [
-          { image: '/static/images/banner/banner01.png' },
-          { image: '/static/images/banner/banner02.png' },
-          { image: '/static/images/banner/banner03.png' },
-		  { image: '/static/images/banner/banner04.png' }
-        ],
-		isAdmin: false,
-      };
-    },
-	onLoad(){
-		this.checkAdmin()
-      },
+import { getUserProfile } from '@/api/system/user'
+import { listNotifications } from '@/api/notification'
 
-    methods: {
-	  async checkAdmin() {
-	        try {
-	          const response = await getUserProfile();
-	          console.log(response);
-	          const user = response.data;
-	          this.isAdmin = user.roles.some(role => role.roleKey === 'admin');
-	        } catch (error) {
-	          console.error('Error fetching user profile:', error);
-	        }
-	      },
-      clickBannerItem(item) {
-        console.info(item);
-      },
-      changeSwiper(e) {
-        this.current = e.detail.current;
-      },
-      changeGrid(e) {
-		  
-		  if (e.detail.index === 0) {
-		    this.$tab.navigateTo('/pages/Search/index'); // 跳转到历史记录页面
-		  }
-		  if (e.detail.index === 1) {
-		    this.$tab.navigateTo('/pages/history/index'); // 跳转到历史记录页面
-		  }
-		  if (e.detail.index === 2) {
-		    this.$tab.navigateTo('/pages/notice_management/index'); // 跳转到历史记录页面
-		  }
-		  if (e.detail.index === 3) {
-		    this.$tab.navigateTo('/pages/Forum/index'); // 跳转到论坛首页
-		  }
-		  if (e.detail.index === 4) {
-		    this.$tab.navigateTo('/pages/user_management/index'); // 跳转到论坛首页
-		  }
-        
-      },
+export default {
+  data() {
+    return {
+      current: 0,
+      swiperDotIndex: 0,
+      data: [
+        { image: '/static/images/banner/banner01.png' },
+        { image: '/static/images/banner/banner02.png' },
+        { image: '/static/images/banner/banner03.png' },
+        { image: '/static/images/banner/banner04.png' }
+      ],
+      isAdmin: false,
+      unreadCount: 0 // 未读通知数量
+    };
+  },
+  onLoad(){
+    this.checkAdmin()
+  },
+  onShow() {
+    this.fetchNotifications() // 每次页面显示时获取未读通知数量
+  },
+  methods: {
+    async checkAdmin() {
+      try {
+        const response = await getUserProfile();
+        console.log(response);
+        const user = response.data;
+        this.isAdmin = user.roles.some(role => role.roleKey === 'admin');
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+      }
     },
-  };
+    fetchNotifications() {
+      const userName = this.$store.state.user.name;
+      listNotifications(userName).then(response => {
+        const notifications = response.data;
+        // 计算未读通知数量
+        this.unreadCount = notifications.filter(notification => !notification.isRead).length;
+		// console.log(this.unreadCount)
+      }).catch(error => {
+        console.error('Error fetching notifications:', error);
+      });
+    },
+    clickBannerItem(item) {
+      console.info(item);
+    },
+    changeSwiper(e) {
+      this.current = e.detail.current;
+    },
+    changeGrid(e) {
+      if (e.detail.index === 0) {
+        this.$tab.navigateTo('/pages/Search/index'); // 跳转到搜索页面
+      }
+      if (e.detail.index === 1) {
+        this.$tab.navigateTo('/pages/history/index'); // 跳转到历史记录页面
+      }
+      if (e.detail.index === 2) {
+        this.$tab.navigateTo('/pages/notice_management/index'); // 跳转到通知公告页面
+      }
+      if (e.detail.index === 3) {
+        this.$tab.navigateTo('/pages/Forum/index'); // 跳转到论坛首页
+      }
+      if (e.detail.index === 4) {
+        this.$tab.navigateTo('/pages/user_management/index'); // 跳转到用户管理页面
+      }
+	  if (e.detail.index === 5) {
+	    this.$tab.navigateTo('/pages/forum_control/index'); // 跳转到用户管理页面
+	  }
+	  if (e.detail.index === 6) {
+	    this.$tab.navigateTo('/pages/userFile/index'); // 跳转到用户管理页面
+	  }
+    },
+  },
+};
 </script>
 
-<style lang="scss">
-/* #ifndef APP-NVUE */
-page {
+<style scoped>
+.work-container {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
   background-color: #fff;
   min-height: 100%;
-  height: auto;
 }
-
-view {
-  font-size: 14px;
-  line-height: inherit;
-}
-
-/* #endif */
 
 .text {
   text-align: center;
@@ -187,13 +161,23 @@ view {
 
 .grid-item-box {
   flex: 1;
-  /* #ifndef APP-NVUE */
   display: flex;
-  /* #endif */
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 15px 0;
+  position: relative; /* 为了放置徽章 */
+}
+
+.badge {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  background-color: #ff4d4f;
+  color: #fff;
+  padding: 2px 5px;
+  border-radius: 50%;
+  font-size: 12px;
 }
 
 .uni-margin-wrap {
@@ -210,9 +194,7 @@ view {
 }
 
 .swiper-item {
-  /* #ifndef APP-NVUE */
   display: flex;
-  /* #endif */
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -224,9 +206,7 @@ view {
 @media screen and (min-width: 500px) {
   .uni-swiper-dot-box {
     width: 400px;
-    /* #ifndef APP-NVUE */
     margin: 0 auto;
-    /* #endif */
     margin-top: 8px;
   }
 

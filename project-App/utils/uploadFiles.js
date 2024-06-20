@@ -2,7 +2,7 @@ import axios from 'axios'
 import { getToken } from '@/utils/auth'
 import errorCode from '@/utils/errorCode'
 
-const baseURL = 'http://192.168.43.23:8080' // 设置后端地址
+const baseURL = 'http://172.20.255.31:8080' // 设置后端地址
 
 const uploadFile = config => {
   return new Promise((resolve, reject) => {

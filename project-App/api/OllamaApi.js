@@ -1,7 +1,7 @@
 import axios from 'axios';
 import request from '@/utils/request';
 
-const OLLAMA_API_URL = 'http://192.168.43.23:11434';
+const OLLAMA_API_URL = 'http://172.20.255.31:11434';
 
 // 调用 Ollama API 生成补全
 export async function generateOllamaCompletion(prompt) {

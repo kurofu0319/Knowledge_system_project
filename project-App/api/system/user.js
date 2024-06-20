@@ -31,6 +31,13 @@ export function updateUserProfile(data) {
   })
 }
 
+export function getprofileByuserName(userName) {
+  return request({
+    'url': '/system/user/profile/' + userName,
+    'method': 'get'
+  })
+}
+
 // 用户头像上传
 export function uploadAvatar(data) {
   return upload({

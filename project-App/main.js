@@ -6,9 +6,10 @@ import './permission' // permission
  // Font Awesome
 
 // 引入并注册 Uni-UI 组件
-import { uniButton, uniFilePicker } from '@dcloudio/uni-ui'
+import { uniButton, uniFilePicker, uniIcons  } from '@dcloudio/uni-ui'
 
 Vue.component('uni-file-picker', uniFilePicker)
+Vue.component('uni-icons', uniIcons)
 
 Vue.use(plugins)
 

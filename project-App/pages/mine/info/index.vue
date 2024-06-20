@@ -12,7 +12,7 @@
 </template>
 
 <script>
-  import { getUserProfile } from "@/api/system/user"
+  import { getUserProfile, getprofileByuserName } from "@/api/system/user"
 
   export default {
     data() {
@@ -27,13 +27,29 @@
     },
     methods: {
       getUser() {
+		const userName = this.$route.query.userName;
+			
+		if (userName) {
+			getprofileByuserName(userName).then(response => {
+				// console.log("getprofileByuserName");
+				// console.log(response);
+			  this.user = response.data;
+			  this.roleGroup = response.roleGroup;;
+			  this.postGroup = response.postGroup
+			})
+		}
+		else
+		{
         getUserProfile().then(response => {
-          this.user = response.data
-          this.roleGroup = response.roleGroup
-          this.postGroup = response.postGroup
+			// console.log("getprofileByuserName");
+			// console.log(response);
+          this.user = response.data;
+          this.roleGroup = response.roleGroup;
+          this.postGroup = response.postGroup;
         })
       }
     }
+  },
   }
 </script>
 

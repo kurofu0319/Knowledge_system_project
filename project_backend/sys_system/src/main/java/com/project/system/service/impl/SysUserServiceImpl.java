@@ -113,6 +113,13 @@ public class SysUserServiceImpl implements ISysUserService
         return userMapper.selectUserByUserName(userName);
     }
 
+    @Override
+    public SysUser selectEveryUserByUserName(String userName)
+    {
+        return userMapper.selectEveryUserByUserName(userName);
+    }
+
+
     /**
      * 通过用户ID查询用户
      * 
@@ -442,6 +449,7 @@ public class SysUserServiceImpl implements ISysUserService
     @Transactional
     public int deleteUserById(Long userId)
     {
+        userMapper.updateUserNameAndNickName(userId, "用户已注销");
         // 删除用户与角色关联
         userRoleMapper.deleteUserRoleByUserId(userId);
         // 删除用户与岗位表
@@ -463,6 +471,7 @@ public class SysUserServiceImpl implements ISysUserService
         {
             checkUserAllowed(new SysUser(userId));
             checkUserDataScope(userId);
+            userMapper.updateUserNameAndNickName(userId, "用户已注销");
         }
         // 删除用户与角色关联
         userRoleMapper.deleteUserRole(userIds);

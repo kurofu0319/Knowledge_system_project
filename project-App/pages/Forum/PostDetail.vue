@@ -18,7 +18,7 @@
       <hr class="post-reply-divider"/>
     </div>
     <div class="replies">
-      <div class="reply-item" v-for="reply in replies" :key="reply.id">
+      <div class="reply-item" v-for="reply in sortedReplies" :key="reply.id">
         <div class="delete-reply-btn" @click="deleteReply(reply.id)" v-if="reply.userName === $store.state.user.name">
           <i class="fas fa-trash-alt"></i>
         </div>
@@ -63,6 +63,9 @@ import { getPostById, getRepliesByPostId, createReply, deletePostById, deleteRep
 import { getToken } from '@/utils/auth'
 import { formatDateTime } from '@/api/OllamaApi.js'
 import axios from 'axios';
+import config from '@/config.js';
+
+const baseUrl = config.baseUrl;
 
 export default {
   data() {
@@ -75,7 +78,7 @@ export default {
       upload: {
         isUploading: false,
         fileList: [],
-        url: 'http://192.168.43.23:8080/common/upload', // 自定义上传的 URL
+        url: baseUrl + '/common/upload', // 自定义上传的 URL
         headers: {
           Authorization: "Bearer " + getToken()
         }
@@ -90,6 +93,11 @@ export default {
         "border": false, // 是否显示边框
         "dividline": false
       }
+    }
+  },
+  computed: {
+    sortedReplies() {
+      return this.replies.sort((a, b) => b.likes - a.likes);
     }
   },
   methods: {
@@ -249,10 +257,14 @@ export default {
     },
 downloadFile(url, fileName) {
     // 在H5环境中
+	const urlObj = new URL(url);
+	const newPath = baseUrl + urlObj.pathname + urlObj.search + urlObj.hash;
+	console.log(url)
+	console.log(newPath)
     if (typeof plus === 'undefined') {
       axios({
         method: 'get',
-        url: url,
+        url: newPath,
         responseType: 'blob'
       }).then(response => {
         const link = document.createElement('a');
@@ -277,7 +289,7 @@ downloadFile(url, fileName) {
         console.error('下载文件失败：', error);
       });
     } else { // 在App环境中
-      this.plusDownloadFile(url, fileName);
+      this.plusDownloadFile(newPath, fileName);
     }
   },
   plusDownloadFile(url, fileName) {

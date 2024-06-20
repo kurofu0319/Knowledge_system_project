@@ -3,6 +3,7 @@
     <view class="header">
       <view class="title">通知公告管理</view>
       <button v-if="isAdmin" @click="handleAdd">新增公告</button>
+      <button @click="handleDeleteReadNotifications">删除已读</button>
     </view>
     <view class="content">
       <view class="section">
@@ -10,13 +11,11 @@
         <view class="table">
           <view class="table-header">
             <view class="table-cell">标题</view>
-            <view class="table-cell">类型</view>
             <view class="table-cell">发布时间</view>
             <view class="table-cell">操作</view>
           </view>
           <view v-for="notice in noticeList" :key="notice.noticeId" class="table-row">
             <view class="table-cell">{{ notice.noticeTitle }}</view>
-            <view class="table-cell">{{ notice.noticeType === '1' ? '通知' : '公告' }}</view>
             <view class="table-cell">{{ notice.createTime }}</view>
             <view class="table-cell">
               <button v-if="isAdmin" @click="handleEdit(notice.noticeId)">编辑</button>
@@ -35,7 +34,7 @@
           </view>
           <view v-for="notification in notificationList" :key="notification.id" :class="{'table-row': true, 'read': notification.isRead, 'unread': !notification.isRead}">
             <view class="table-cell">{{ notification.content }}</view>
-            <view class="table-cell">{{ notification.createTime }}</view>
+            <view class="table-cell">{{ formatTime(notification.createTime) }}</view>
             <view class="table-cell">
               <button @click="handleNotificationClick(notification)">查看</button>
               <button @click="handleDeleteNotification(notification.id)">删除</button>
@@ -133,6 +132,45 @@ export default {
       }).catch(error => {
         console.error('Error deleting notification:', error)
       })
+    },
+    handleDeleteReadNotifications() {
+      const readNotifications = this.notificationList.filter(notification => notification.isRead).map(notification => notification.id);
+      if (readNotifications.length === 0) {
+        uni.showToast({
+          title: '没有已读通知',
+          icon: 'none'
+        });
+        return;
+      }
+      deleteNotification(readNotifications).then(() => {
+        uni.showToast({
+          title: '已读通知删除成功',
+          icon: 'success'
+        })
+        this.fetchNotifications()
+      }).catch(error => {
+        console.error('Error deleting read notifications:', error)
+      })
+    },
+    formatTime(time) {
+      const currentTime = new Date();
+      const postTime = new Date(time);
+      const diff = currentTime - postTime;
+
+      const seconds = Math.floor(diff / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+      const days = Math.floor(hours / 24);
+
+      if (days > 0) {
+        return `${days}天前`;
+      } else if (hours > 0) {
+        return `${hours}小时前`;
+      } else if (minutes > 0) {
+        return `${minutes}分钟前`;
+      } else {
+        return `刚刚`;
+      }
     }
   }
 }

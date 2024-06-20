@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.system.mapper.ForumContentMapper">
+    <!-- 定义结果映射 -->
+    <resultMap type="com.project.system.domain.ForumContent" id="ForumContentResult">
+        <id property="id" column="id" />
+        <result property="uploadDate" column="upload_date" />
+        <result property="fileUrl" column="file_url" />
+        <result property="fileName" column="file_name" />
+        <result property="has_upload" column="has_upload" />
+    </resultMap>
+
+    <!-- 插入语句 -->
+    <insert id="insert" parameterType="com.project.system.domain.ForumContent">
+        INSERT INTO forum_content (file_name, upload_date, file_url, has_upload)
+        VALUES (#{fileName}, NOW(), #{fileUrl}, #{has_upload})
+    </insert>
+
+    <!-- 查询所有记录 -->
+    <select id="findAll" resultMap="ForumContentResult">
+        SELECT * FROM forum_content
+    </select>
+
+    <update id="update_upload" parameterType="String">
+        update user_file set has_upload = 1 where has_upload = 0;
+    </update>
+</mapper>

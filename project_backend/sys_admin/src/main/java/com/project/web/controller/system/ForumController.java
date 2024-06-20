@@ -65,7 +65,7 @@ public class ForumController extends BaseController {
         ForumPost post = forumPostService.selectPostById(postId);
         SysNotification notification = new SysNotification();
         notification.setUserName(post.getUserName());
-        notification.setContent("Your post has been liked by " + userName);
+        notification.setContent(userName + "点赞了你的帖子");
         notification.setPostId(postId);
         notification.setCreateTime(new Date());
         notification.setIsRead(false);
@@ -104,7 +104,7 @@ public class ForumController extends BaseController {
         ForumPost post = forumPostService.selectPostById(reply.getPostId());
         SysNotification notification = new SysNotification();
         notification.setUserName(post.getUserName());
-        notification.setContent("Your post has been replied by " + reply.getUserName());
+        notification.setContent(reply.getUserName() + "回复了你的帖子");
         notification.setPostId(reply.getPostId());
         notification.setCreateTime(new Date());
         notification.setIsRead(false);
@@ -131,7 +131,7 @@ public class ForumController extends BaseController {
         ForumReply reply = forumReplyService.selectReplyById(replyId);
         SysNotification notification = new SysNotification();
         notification.setUserName(reply.getUserName());
-        notification.setContent("Your reply has been liked by " + userName);
+        notification.setContent(userName + "点赞了你的回复");
         notification.setPostId(reply.getPostId());
         notification.setCreateTime(new Date());
         notification.setIsRead(false);

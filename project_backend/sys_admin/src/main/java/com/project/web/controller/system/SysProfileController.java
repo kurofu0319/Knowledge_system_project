@@ -1,13 +1,8 @@
 package com.project.web.controller.system;
 
+import com.project.system.mapper.SysUserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.project.common.config.RuoYiConfig;
 import com.project.common.core.controller.BaseController;
@@ -49,6 +44,18 @@ public class SysProfileController extends BaseController
 //        ajax.put("postGroup", userService.selectUserPostGroup(loginUser.getUsername()));
         return ajax;
     }
+
+    @GetMapping("/{userName}")
+    public AjaxResult getprofileByuserName(@PathVariable String userName)
+    {
+        SysUser user = userService.selectEveryUserByUserName(userName);
+        AjaxResult ajax = AjaxResult.success(user);
+//        ajax.put("roleGroup", userService.selectUserRoleGroup(loginUser.getUsername()));
+//        ajax.put("postGroup", userService.selectUserPostGroup(loginUser.getUsername()));
+        return ajax;
+    }
+
+
 
     /**
      * 修改用户
