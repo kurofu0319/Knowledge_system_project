@@ -31,8 +31,9 @@
 <script>
 import { getprofileByuserName } from '../../api/system/user'
 import { getAllPosts, getRepliesByPostId } from '@/api/forum'
+import config from '@/config.js';
 
-const baseUrl = "http://172.20.255.31:8080"
+const baseUrl = config.baseUrl;
 
 export default {
   data() {

@@ -1,7 +1,9 @@
 <template>
   <div class="admin-forum-container">
-    <h1>论坛管理</h1>
-	
+	<div class="title">
+		<h1>论坛管理</h1>
+		<button class="update-button" @click="navigateToDetail"> 查看已上传 </button>
+	</div>
     <div class="filter-options">
       <select v-model="filterDays" @change="filterPosts">
         <option value="0">全部</option>
@@ -40,7 +42,7 @@
       </div>
     </div>
     <button @click="generateAndUploadTxt">生成并上传TXT</button>
-	<button @click="navigateToDetail"> 查看已上传 </button>
+	
   </div>
 </template>
 
@@ -132,7 +134,7 @@ export default {
       this.filteredPosts = this.posts.filter(post => {
         const postDate = new Date(post.postTime);
         const diffDays = (now - postDate) / (1000 * 60 * 60 * 24);
-        return this.filterDays === 0 || diffDays <= this.filterDays;
+        return this.filterDays == 0 || diffDays <= this.filterDays;
       });
     },
     generateTxtContent() {
@@ -183,6 +185,17 @@ export default {
 
 
 <style scoped>
+	
+.update-button {
+	position: absolute;/*或relative*/ 
+	top: 10px;
+	left: 70%;
+}
+
+.title	 {
+	display: flex;
+}	
+	
 .admin-forum-container {
   padding: 20px;
   background-color: #f9f9f9;

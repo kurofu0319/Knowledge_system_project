@@ -29,4 +29,8 @@
         update user_file set has_upload = 1 where user_name = #{userName} AND has_upload = 0;
     </update>
 
+    <delete id="delete_file" parameterType="com.project.system.domain.UserFile">
+        delete from user_file where  file_name = #{fileName};
+    </delete>
+
 </mapper>

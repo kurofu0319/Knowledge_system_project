@@ -29,4 +29,8 @@ public class ForumContentServiceImpl implements IForumContentService {
         forumContentMapper.update_upload();
     }
 
+    @Override
+    public void deleteFile(ForumContent forumContent) {
+        forumContentMapper.delete_file(forumContent);
+    }
 }

@@ -15,4 +15,6 @@ public interface ForumContentMapper {
     List<ForumContent> findAll();
 
     void update_upload ();
+
+    void delete_file(ForumContent forumContent);
 }

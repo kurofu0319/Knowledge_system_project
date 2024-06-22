@@ -31,4 +31,10 @@ public class ForumContentController {
         forumContentService.uploadFile();
         return ResponseEntity.ok(forumContentService.getAllFiles());
     }
+
+    @PostMapping("/delete")
+    public ResponseEntity<ForumContent> deleteFile(@RequestBody ForumContent forumContent) {
+        forumContentService.deleteFile(forumContent);
+        return ResponseEntity.ok(forumContent);
+    }
 }

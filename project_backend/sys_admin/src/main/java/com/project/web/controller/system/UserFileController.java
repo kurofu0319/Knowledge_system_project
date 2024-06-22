@@ -20,15 +20,6 @@ public class UserFileController {
 
     @PostMapping("/save")
     public ResponseEntity<UserFile> saveFileUrl(@RequestBody UserFile userFile) {
-//        System.out.println("userName: " + userName);
-//        System.out.println("fileName: " + fileName);
-//        System.out.println("fileUrl: " + fileUrl);
-//
-//        UserFile userFile = new UserFile();
-//        userFile.setUserName(userName);
-//        userFile.setFileName(fileName);
-//        userFile.setFileUrl(fileUrl);
-
         userFileService.saveFile(userFile);
         return ResponseEntity.ok(userFile);
     }
@@ -42,5 +33,11 @@ public class UserFileController {
     public ResponseEntity<String> uploadFiles(@RequestParam("userName") String userName) {
         userFileService.uploadFile(userName);
         return ResponseEntity.ok(userName);
+    }
+
+    @PostMapping("/delete")
+    public ResponseEntity<UserFile> deleteFile(@RequestBody UserFile userFile) {
+        userFileService.deleteFile(userFile);
+        return ResponseEntity.ok(userFile);
     }
 }

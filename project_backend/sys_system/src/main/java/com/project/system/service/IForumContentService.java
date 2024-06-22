@@ -8,4 +8,5 @@ public interface IForumContentService {
     void saveFile(ForumContent forumContent);
     List<ForumContent> getAllFiles();
     void uploadFile();
+    void deleteFile(ForumContent forumContent);
 }

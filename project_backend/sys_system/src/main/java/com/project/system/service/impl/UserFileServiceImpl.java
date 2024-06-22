@@ -29,4 +29,10 @@ public class UserFileServiceImpl implements IUserFileService {
         userFileMapper.update_upload(userName);
     }
 
+    @Override
+    public void deleteFile(UserFile userFile) {
+        userFileMapper.delete_file(userFile);
+    }
+
+
 }

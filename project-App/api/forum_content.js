@@ -38,3 +38,19 @@ export function uploadnewFiles() {
     }
   })
 }
+
+export function deleteFile(fileUrl, fileName) {
+  const data = {
+    fileName,
+    fileUrl
+  }
+  return request({
+    url: '/forumContent/files/delete',
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + getToken()
+    },
+    data: data
+  })
+}

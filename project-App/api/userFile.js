@@ -65,5 +65,23 @@ export function uploadnewFiles(userName) {
 	      throw error;
 	    }
 	  }
+	  
+	export function deleteFile(userName, fileName, fileUrl) {
+	  const data = {
+	    userName,
+	    fileName,
+	    fileUrl
+	  };
+	  
+	  return request({
+	    url: '/userfiles/delete',
+	    method: 'post',
+	    headers: {
+	      'Content-Type': 'application/json',
+	      Authorization: 'Bearer ' + getToken()
+	    },
+	    data: data
+	  });
+	}
 
 

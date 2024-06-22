@@ -1,7 +1,10 @@
 <template>
   <div class="uploaded-files-container">
-    <h1>上传的文件列表</h1>
-    <table>
+	<div class="title">
+		<h1>上传的文件列表</h1>
+		<uni-button class = "update-button" @click="updateDatabase" type="primary">更新知识库</uni-button>
+    </div>
+	<table>
       <thead>
         <tr>
           <th>文件名</th>
@@ -15,6 +18,7 @@
           <td>{{ file.uploadDate }}</td>
           <td>
             <a href="#" @click="downloadFile(file.fileUrl, file.fileName)">下载</a>
+			<a href="#" @click="deleteFile(file.fileUrl, file.fileName)">删除</a>
           </td>
         </tr>
       </tbody>
@@ -23,7 +27,7 @@
 </template>
 
 <script>
-import { getAllFiles } from '@/api/forum_content';
+import { getAllFiles, deleteFile } from '@/api/forum_content';
 import axios from 'axios';
 import config from '@/config.js';
 
@@ -36,6 +40,11 @@ export default {
     };
   },
   methods: {
+	  deleteFile(url, fileName) {
+		  deleteFile(url, fileName).then(response => {
+			  this.fetchUploadedFiles();
+		  });
+	  },
     fetchUploadedFiles() {
       getAllFiles().then(response => {
 		console.log(response)
@@ -115,6 +124,17 @@ export default {
 </script>
 
 <style scoped>
+.update-button {
+	
+	position: absolute;/*或relative*/ 
+	top: 20px;
+	left: 60%;
+}	
+	
+.title	 {
+	display: flex;
+}
+
 .uploaded-files-container {
   padding: 20px;
   background-color: #f9f9f9;

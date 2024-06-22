@@ -105,6 +105,12 @@ export default {
         console.error("Failed to fetch hot posts:", error);
       });
     },
+	processedHotPosts() {
+	  return this.hotPosts.map(post => ({
+	    ...post,
+	    barWidth: this.calculateBarWidth(post.likes)
+	  }));
+	},
     calculateBarWidth(likes) {
       return (likes / this.maxLikes) * 100;
     },

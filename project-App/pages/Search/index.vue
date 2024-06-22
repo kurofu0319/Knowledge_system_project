@@ -22,6 +22,7 @@
 <script>
 import { generateOllamaCompletion, saveSearchHistory } from '@/api/OllamaApi';
 import { getInfo } from '@/api/login';
+import { uploadDocument, chatWithDocument } from '@/api/ragDemo'
 
 export default {
   data() {
@@ -32,53 +33,100 @@ export default {
     };
   },
   methods: {
-    async handleSearch() {
-      if (this.searchKeyword === "") {
-        this.$modal.msgError("请输入搜索内容");
-        return;
-      }
+    // async handleSearch() {
+    //   if (this.searchKeyword === "") {
+    //     this.$modal.msgError("请输入搜索内容");
+    //     return;
+    //   }
 
-      // 临时存储当前的搜索关键字
-      const currentKeyword = this.searchKeyword;
+    //   // 临时存储当前的搜索关键字
+    //   const currentKeyword = this.searchKeyword;
 
-      // 清空搜索输入框
-      this.searchKeyword = '';
+    //   // 清空搜索输入框
+    //   this.searchKeyword = '';
 
-      // 添加用户消息到聊天框
-      this.messages.push({
-        id: Date.now(),
-        type: 'user',
-        content: currentKeyword
-      });
+    //   // 添加用户消息到聊天框
+    //   this.messages.push({
+    //     id: Date.now(),
+    //     type: 'user',
+    //     content: currentKeyword
+    //   });
 
-      // 设置加载状态
-      this.loading = true;
+    //   // 设置加载状态
+    //   this.loading = true;
 
-      // 发送搜索请求到后端
-      try {
-        const result = await generateOllamaCompletion(currentKeyword);
-        console.log(result);
+    //   // 发送搜索请求到后端
+    //   try {
+    //     const result = await generateOllamaCompletion(currentKeyword);
+    //     console.log(result);
 
-        // 添加机器人的响应到聊天框
-        this.messages.push({
-          id: Date.now() + 1,
-          type: 'bot',
-          content: result.response
-        });
+    //     // 添加机器人的响应到聊天框
+    //     this.messages.push({
+    //       id: Date.now() + 1,
+    //       type: 'bot',
+    //       content: result.response
+    //     });
 
-        // 获取用户信息
-        const userInfo = await getInfo();
-        const userName = userInfo.user.userName; // 假设后端返回的用户信息包含 userName 属性
+    //     // 获取用户信息
+    //     const userInfo = await getInfo();
+    //     const userName = userInfo.user.userName; // 假设后端返回的用户信息包含 userName 属性
 
-        // 保存搜索结果到后端
-        await saveSearchHistory(userName, currentKeyword, result.response);
-      } catch (error) {
-        console.error('搜索请求失败:', error);
-        this.$modal.msgError("搜索请求失败");
-      }
+    //     // 保存搜索结果到后端
+    //     await saveSearchHistory(userName, currentKeyword, result.response);
+    //   } catch (error) {
+    //     console.error('搜索请求失败:', error);
+    //     this.$modal.msgError("搜索请求失败");
+    //   }
 
-      // 关闭加载状态
-      this.loading = false;
+    //   // 关闭加载状态
+    //   this.loading = false;
+	  
+	  
+	  
+	  async handleSearch() {
+	    if (this.searchKeyword === "") {
+	      this.$modal.msgError("请输入搜索内容");
+	      return;
+	    }
+	  
+	    const currentKeyword = this.searchKeyword;
+	    this.searchKeyword = '';
+	    this.loading = true;
+		
+		this.messages.push({
+		    id: Date.now(),
+		    type: 'user',
+		    content: currentKeyword
+		  });
+	  
+	    try {
+	      const result = await chatWithDocument(currentKeyword);
+	      console.log(result);
+	  
+	      // 将搜索结果存储到searchResult中
+	      this.searchResult = result.data;
+		  
+		  this.messages.push({
+		    id: Date.now() + 1,
+		    type: 'bot',
+		    content: result.data
+		  });
+	  
+	      const userInfo = await getInfo();
+	      const userName = userInfo.user.userName;
+	      await saveSearchHistory(userName, currentKeyword, result.response);
+	    } catch (error) {
+	      console.error('搜索请求失败:', error);
+	      this.$modal.msgError("搜索请求失败");
+	    }
+	  
+	    this.loading = false;
+	  
+	  
+	  
+	  
+	  
+	  
 
       // 滚动到最新消息
       this.$nextTick(() => {

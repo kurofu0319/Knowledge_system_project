@@ -24,6 +24,10 @@
     </select>
 
     <update id="update_upload" parameterType="String">
-        update user_file set has_upload = 1 where has_upload = 0;
+        update forum_content set has_upload = 1 where has_upload = 0;
     </update>
+
+    <delete id="delete_file" parameterType="com.project.system.domain.ForumContent">
+        delete from forum_content where  file_name = #{fileName};
+    </delete>
 </mapper>

@@ -1,7 +1,9 @@
 <template>
   <div class="knowledge-base-container">
-    <h1>个人知识库</h1>
-	<uni-button @click="updateDatabase" type="primary">更新个人知识库</uni-button>
+	<div class="title">
+		<h1>个人知识库</h1>
+		<uni-button class = "update-button" @click="updateDatabase" type="primary">更新个人知识库</uni-button>
+	</div>
     <div class="upload-section">
       <uni-file-picker 
         ref="files"
@@ -36,6 +38,7 @@
             <td>{{ file.uploadDate }}</td>
             <td>
               <a href="#" @click="downloadFile(file.fileUrl, file.fileName)">下载</a>
+			  <a href="#" @click="deleteFile(file.fileUrl, file.fileName)">删除</a>
             </td>
           </tr>
         </tbody>
@@ -61,7 +64,7 @@
 
 <script>
 import axios from 'axios';
-import { saveFileInfo, getAllFiles, uploadnewFiles, getFileFromUrl } from '@/api/userFile';
+import { saveFileInfo, getAllFiles, uploadnewFiles, getFileFromUrl, deleteFile } from '@/api/userFile';
 import config from '@/config.js';
 import { getToken } from '@/utils/auth';
 import { uploadDocument, chatWithDocument } from '@/api/ragDemo'
@@ -108,6 +111,12 @@ export default {
     }
   },
   methods: { 
+	  deleteFile(url, fileName) {
+		  deleteFile(this.userName, fileName, url).then(response => {
+			  this.fetchUploadedFiles();
+		  });
+	  },
+	  
 	  async handleSearch() {
 	    if (this.searchKeyword === "") {
 	      this.$modal.msgError("请输入搜索内容");
@@ -220,6 +229,7 @@ export default {
 			  console.log(this.userName)
 			  saveFileInfo(this.userName, file.name, fileUrl).then(() => {
 			  alert('文件上传并保存成功');
+			  this.fetchUploadedFiles();
 		  });
 	    }).catch(error => {
 	      uni.showToast({
@@ -229,6 +239,8 @@ export default {
 	      this.uploadFail(error);
 	    });
 	  });
+	  
+	   
 	},
    //  uploadFile() {
    //    if (this.fileList.length === 0) {
@@ -336,6 +348,19 @@ export default {
 
 
 <style scoped>
+	
+.update-button {
+	
+	position: absolute;/*或relative*/ 
+	top: 20px;
+	left: 60%;
+}
+
+	
+.title	 {
+	display: flex;
+}
+	
 .knowledge-base-container {
   padding: 20px;
   background-color: #f9f9f9;
