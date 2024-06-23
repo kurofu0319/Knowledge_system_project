@@ -171,13 +171,11 @@ export default {
   padding: 20px;
 }
 
-
 .title {
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
-
 }
 
 .navbar {
@@ -187,6 +185,7 @@ export default {
   width: 85%;
   background-color: #55aaff;
   padding: 40px;
+  border-radius: 10px; /* 增加圆角 */
 }
 
 .app-title {
