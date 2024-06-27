@@ -2,7 +2,7 @@
   <div class="knowledge-base-container">
 	<div class="title">
 		<h1>个人知识库</h1>
-		<uni-button class = "update-button" @click="updateDatabase" type="primary">更新个人知识库</uni-button>
+		<uni-button class = "update-button" @click="updateDatabase" type="primary">更新</uni-button>
 	</div>
     <div class="upload-section">
       <uni-file-picker 
@@ -16,30 +16,34 @@
         @fail="uploadFail"
         :list-styles="listStyles"
       >
-        <uni-button >点击上传</uni-button>
+        <uni-button >选择文件路径</uni-button>
       </uni-file-picker>
-      <uni-button @click="submitUpload" type="primary" :loading="upload.isUploading">上传文件</uni-button>
+      <uni-button @click="submitUpload" type="primary" :loading="upload.isUploading">上传</uni-button>
     </div>
     <div class="search-section">
-      <input v-model="searchQuery" @input="searchFiles" placeholder="按名称搜索文件" />
+      <input v-model="searchQuery" @input="searchFiles" class="search-input" placeholder="按名称搜索文件" />
     </div>
     <div class="file-list">
       <table>
         <thead>
           <tr>
-            <th>文件名</th>
-            <th>上传日期</th>
-            <th>操作</th>
+            <th class="file-name">文件名</th>
+            <th class="update-date">上传日期</th>
+            <th class="action-column">操作</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="file in filteredFiles" :key="file.id">
             <td>{{ file.fileName }}</td>
             <td>{{ file.uploadDate }}</td>
-            <td>
-              <a href="#" @click="downloadFile(file.fileUrl, file.fileName)">下载</a>
-			  <a href="#" @click="deleteFile(file.fileUrl, file.fileName)">删除</a>
-            </td>
+            <td class="action-buttons">
+              <button class="download-btn" @click="downloadFile(file.fileUrl, file.fileName)">
+                <i class="fas fa-download"></i>
+              </button>
+              <button class="delete-btn" @click="deleteFile(file.fileUrl, file.fileName)">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+			</td>
           </tr>
         </tbody>
       </table>
@@ -353,7 +357,7 @@ export default {
 	
 	position: absolute;/*或relative*/ 
 	top: 20px;
-	left: 60%;
+	left: 80.5%;
 }
 
 	
@@ -400,13 +404,33 @@ th {
   background-color: #f2f2f2;
 }
 
-a {
-  color: #007bff;
-  text-decoration: none;
+.file-name{
+  width: 150px; /* 增加操作列的宽度 */
 }
 
-a:hover {
-  text-decoration: underline;
+.update-date{
+  width: 150px; /* 增加操作列的宽度 */
+}
+
+.action-column {
+  width: 150px; /* 增加操作列的宽度 */
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.download-btn i {
+  color: royalblue;
+}
+
+.delete-btn {
+  background-color: #ff4d4f;
+}
+
+.delete-btn i {
+  color: white;
 }
 
 .search-title {
@@ -421,7 +445,10 @@ a:hover {
   justify-content: center;
   align-items: center;
   margin-top: 20px;
-  width: 100%;
+  width: 95%;
+  border: 1px solid #ccc; /* 增加边框 */
+  border-radius: 5px; /* 圆角 */
+  padding: 10px; /* 内边距 */
 }
 
 .search-input {

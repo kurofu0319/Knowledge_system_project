@@ -2,42 +2,54 @@
   <view>
     <view class="header">
       <view class="title">通知公告管理</view>
-      <button v-if="isAdmin" @click="handleAdd">新增公告</button>
-      <button @click="handleDeleteReadNotifications">删除已读</button>
     </view>
     <view class="content">
       <view class="section">
-        <view class="section-title">公告</view>
+        <view class="section-header">
+          <view class="section-title">公告</view>
+          <button v-if="isAdmin" @click="handleAdd" class="section-button">新增公告</button>
+        </view>
         <view class="table">
           <view class="table-header">
-            <view class="table-cell">标题</view>
-            <view class="table-cell">发布时间</view>
-            <view class="table-cell">操作</view>
+            <view class="table-cell center">标题</view>
+            <view class="table-cell center">发布时间</view>
+            <view class="table-cell center">操作</view>
           </view>
           <view v-for="notice in noticeList" :key="notice.noticeId" class="table-row">
             <view class="table-cell">{{ notice.noticeTitle }}</view>
             <view class="table-cell">{{ notice.createTime }}</view>
-            <view class="table-cell">
-              <button v-if="isAdmin" @click="handleEdit(notice.noticeId)">编辑</button>
-              <button v-if="isAdmin" @click="handleDelete(notice.noticeId)">删除</button>
+            <view class="action-buttons center">
+<!--              <button class="edit-btn" @click="handleEdit(notice.noticeId)">
+                <i class="fas fa-cog"></i>
+              </button> -->
+              <button class="delete-btn" @click="handleDelete(notice.noticeId)">
+                <i class="fas fa-trash-alt"></i>
+              </button>
             </view>
           </view>
         </view>
       </view>
       <view class="section">
-        <view class="section-title">通知</view>
+        <view class="section-header">
+          <view class="section-title">通知</view>
+          <button @click="handleDeleteReadNotifications" class="section-button">删除已读</button>
+        </view>
         <view class="table">
           <view class="table-header">
-            <view class="table-cell">通知内容</view>
-            <view class="table-cell">时间</view>
-            <view class="table-cell">操作</view>
+            <view class="table-cell center">通知内容</view>
+            <view class="table-cell center">时间</view>
+            <view class="table-cell center">操作</view>
           </view>
           <view v-for="notification in notificationList" :key="notification.id" :class="{'table-row': true, 'read': notification.isRead, 'unread': !notification.isRead}">
             <view class="table-cell">{{ notification.content }}</view>
-            <view class="table-cell">{{ formatTime(notification.createTime) }}</view>
-            <view class="table-cell">
-              <button @click="handleNotificationClick(notification)">查看</button>
-              <button @click="handleDeleteNotification(notification.id)">删除</button>
+            <view class="table-cell-formatTime">{{ formatTime(notification.createTime) }}</view>
+            <view class="action-buttons">
+              <button class="view-btn" @click="handleNotificationClick(notification)">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="delete-btn" @click="handleDeleteNotification(notification.id)">
+                <i class="fas fa-trash-alt"></i>
+              </button>
             </view>
           </view>
         </view>
@@ -184,18 +196,21 @@ export default {
   padding: 10px;
 }
 .title {
+  font-size: 32px;
+  font-weight: bold;
+}
+.section-title{
   font-size: 20px;
+  font-weight: bold;
 }
 .content {
   padding: 10px;
 }
-.section {
-  margin-bottom: 20px;
-}
-.section-title {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 10px;
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px; /* 可根据需要调整 */
 }
 .table {
   width: 100%;
@@ -208,10 +223,23 @@ export default {
 .table-cell {
   flex: 1;
   padding: 10px;
-  text-align: center;
+  text-align: left;
 }
-.table-header {
+
+.table-cell-formatTime {
+  flex: 1;
+  padding: 10px;
+  
+  margin-left: 30px;
+}
+
+
+.table-header .table-cell {
+  font-weight: bold;
   background-color: #f5f5f5;
+}
+.center {
+	text-align: center;
 }
 .read {
   background-color: #e0e0e0; /* Gray background for read notifications */
@@ -220,4 +248,30 @@ export default {
   background-color: #ffffff; /* White background for unread notifications */
   font-weight: bold; /* Bold text for unread notifications */
 }
+.action-buttons {
+  display: flex;
+  justify-content: space-between; /* 确保按钮左右放置 */
+  gap: 10px; /* 增加按钮之间的间距 */
+}
+.view-btn, .edit-btn, .delete-btn {
+  width: 40px; /* 保证按钮是正方形 */
+  height: 40px; /* 保证按钮是正方形 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.view-btn i {
+  color: black;
+}
+.edit-btn i {
+  color: #007bff;
+}
+.delete-btn i {
+  color: #ff4d4f;
+}
+
 </style>

@@ -2,34 +2,38 @@
   <div class="post-detail-container">
     <div class="post-header">
       <h1 class="post-title">{{ post.title }}</h1>
-      <div class="delete-post-btn" @click="deletePost" v-if="post.userName === $store.state.user.name">
-        <i class="fas fa-trash-alt"></i>
-      </div>
       <div class="spacer"></div>
       <p class="post-content">{{ post.content }}</p>
       <div class="spacer"></div>
       <div class="post-user-container">
         <span class="post-user" @click="navigateToUserInfo(post.userId)">{{ post.userName }} - {{ post.postTime }}</span>
-        <span class="post-likes">
-          <i :class="['fas', 'fa-heart', { liked: likedPost }]" @click="toggleLikePost"></i>
-          <span class="like-count">{{ post.likes }}</span>
-        </span>
+        <div class="post-actions">
+          <span class="post-likes">
+            <i :class="['fas', 'fa-heart', { liked: likedPost }]" @click="toggleLikePost"></i>
+            <span class="like-count">{{ post.likes }}</span>
+          </span>
+          <div class="delete-post-btn" @click="deletePost" v-if="post.userName === $store.state.user.name">
+            <i class="fas fa-trash-alt"></i>
+          </div>
+        </div>
       </div>
       <hr class="post-reply-divider"/>
     </div>
     <div class="replies">
       <div class="reply-item" v-for="reply in sortedReplies" :key="reply.id">
-        <div class="delete-reply-btn" @click="deleteReply(reply.id)" v-if="reply.userName === $store.state.user.name">
-          <i class="fas fa-trash-alt"></i>
-        </div>
         <p class="reply-content">{{ reply.content }}</p>
         <div class="spacer"></div>
         <div class="reply-user-container">
           <span class="reply-user" @click="navigateToUserInfo(reply.userId)">{{ reply.userName }} - {{ reply.replyTime }}</span>
-          <span class="reply-likes">
-            <i :class="['fas', 'fa-heart', { liked: likedReplies.includes(reply.id) }]" @click="toggleLikeReply(reply)"></i>
-            <span class="like-count">{{ reply.likes }}</span>
-          </span>
+          <div class="reply-actions">
+            <span class="reply-likes">
+              <i :class="['fas', 'fa-heart', { liked: likedReplies.includes(reply.id) }]" @click="toggleLikeReply(reply)"></i>
+              <span class="like-count">{{ reply.likes }}</span>
+            </span>
+            <div class="delete-reply-btn" @click="deleteReply(reply.id)" v-if="reply.userName === $store.state.user.name">
+              <i class="fas fa-trash-alt"></i>
+            </div>
+          </div>
         </div>
         <div v-if="reply.fileUrl" class="reply-file">
           <a href="#" @click="downloadFile(reply.fileUrl, reply.fileName)">{{ reply.fileName }}</a>
@@ -38,7 +42,7 @@
       </div>
     </div>
     <textarea v-model="newReplyContent" placeholder="填写回复"></textarea>
-    <view class="upload-img">
+    <div class="upload-container">
       <uni-file-picker 
         ref="files"
         v-model="fileList"
@@ -52,7 +56,7 @@
       >
         <button>点击上传</button>
       </uni-file-picker>
-    </view>
+    </div>
     <uni-button @click="submitUpload" type="primary" :loading="upload.isUploading">上传文件</uni-button>
     <button @click="addReply" class="submit-btn">提交回复</button>
   </div>
@@ -358,7 +362,6 @@ downloadFile(url, fileName) {
 }
 
 .post-header {
-  position: relative;
   margin-bottom: 20px;
 }
 
@@ -379,12 +382,18 @@ downloadFile(url, fileName) {
 .post-user-container, .reply-user-container {
   display: flex;
   align-items: center;
+  justify-content: space-between; /* Align items to the ends */
 }
 
 .post-user, .reply-user {
   font-size: 0.9em;
   color: #666;
   cursor: pointer; /* 增加点击手型指针 */
+}
+
+.post-actions, .reply-actions {
+  display: flex;
+  align-items: center;
 }
 
 .post-likes, .reply-likes {
@@ -408,12 +417,10 @@ downloadFile(url, fileName) {
 }
 
 .delete-post-btn, .delete-reply-btn {
-  position: absolute;
-  top: 5px;
-  right: 10px; /* 调整位置 */
   color: #1E90FF;
   cursor: pointer;
   font-size: 1em; /* 调整大小 */
+  margin-left: 10px; /* 增大距离 */
 }
 
 .reply-item {
