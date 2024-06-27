@@ -10,11 +10,11 @@
       </view>
       <view class="form-item">
         <text>邮箱</text>
-        <input v-model="user.email" placeholder="请输入邮箱"/>
+        <input v-model="user.email" placeholder="请输入邮箱" class="input-box"/>
       </view>
       <view class="form-item">
         <text>手机号码</text>
-        <input v-model="user.phonenumber" placeholder="请输入手机号码"/>
+        <input v-model="user.phonenumber" placeholder="请输入手机号码" class="input-box"/>
       </view>
       <button @click="handleSubmit">提交</button>
     </view>
@@ -60,7 +60,14 @@ export default {
   padding: 10px;
 }
 .title {
-  font-size: 20px;
+  font-size: 32px;
+  font-weight: bold;
+}
+.input-box {
+  padding: 20px;
+  border: 1px solid #ccc;
+  width: 100%;
+  box-sizing: border-box; /* 确保 padding 不会影响元素的总宽度 */
 }
 .content {
   padding: 10px;

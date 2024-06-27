@@ -2,7 +2,7 @@
   <div class="uploaded-files-container">
 	<div class="title">
 		<h1>上传的文件列表</h1>
-		<uni-button class = "update-button" @click="updateDatabase" type="primary">更新知识库</uni-button>
+		<uni-button class = "update-button" @click="updateDatabase()" type="primary">更新知识库</uni-button>
     </div>
 	<table>
       <thead>
@@ -31,7 +31,9 @@
 </template>
 
 <script>
-import { getAllFiles, deleteFile } from '@/api/forum_content';
+import { getAllFiles, deleteFile, uploadnewFiles } from '@/api/forum_content';
+import { getFileFromUrl } from '@/api/userFile';
+import { uploadDocument } from '@/api/ragDemo'
 import axios from 'axios';
 import config from '@/config.js';
 
@@ -119,8 +121,47 @@ export default {
       });
 
       dtask.start();
-    }
+    },
+	async updateDatabase() {
+		
+		getAllFiles().then(response => {
+				console.log(response)
+		  this.uploadedFiles = response;
+		}).catch(error => {
+		  console.error("Failed to fetch uploaded files:", error);
+		});
+		
+	  const files = this.uploadedFiles;
+	  
+	  // 使用 Promise.all 以便等待所有文件处理和上传完成
+	  const uploadPromises = files.map(async (file) => {
+	    try {
+		  if (file.has_upload === false) {
+			  
+			  const urlObj = new URL(file.fileUrl);
+			  const newPath = baseUrl + urlObj.pathname + urlObj.search + urlObj.hash;
+			  const realFile = await getFileFromUrl(newPath, file.fileName);
+			  console.log('Real file:', realFile);
+			  const response = await uploadDocument(realFile);
+			  console.log('Upload response:', response);
+		  }
+	    } catch (error) {
+	      console.error('Error processing file:', file.fileName, error);
+	    }
+	  });
+	
+	  // 等待所有上传操作完成
+	  await Promise.all(uploadPromises);
+	  uni.showToast({
+	    title: '更新成功',
+	    icon: 'success'
+	  });
+	  console.log('所有文件处理和上传完成');
+	  
+	  uploadnewFiles();
+	}
   },
+
   mounted() {
     this.fetchUploadedFiles();
   }

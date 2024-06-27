@@ -93,6 +93,13 @@ export default {
 	    this.searchKeyword = '';
 	    this.loading = true;
 		
+		  //   // 保存搜索结果到后端
+		  //   await saveSearchHistory(userName, currentKeyword, result.response);
+		  // } catch (error) {
+		  //   console.error('搜索请求失败:', error);
+		  //   this.$modal.msgError("搜索请求失败");
+		  // }
+		
 		this.messages.push({
 		    id: Date.now(),
 		    type: 'user',
@@ -114,11 +121,13 @@ export default {
 	  
 	      const userInfo = await getInfo();
 	      const userName = userInfo.user.userName;
-	      await saveSearchHistory(userName, currentKeyword, result.response);
-	    } catch (error) {
-	      console.error('搜索请求失败:', error);
-	      this.$modal.msgError("搜索请求失败");
-	    }
+		  
+		  
+	      await saveSearchHistory(userName, currentKeyword, result.data);
+			} catch (error) {
+			  console.error('搜索请求失败:', error);
+			  this.$modal.msgError("搜索请求失败");
+			}
 	  
 	    this.loading = false;
 	  

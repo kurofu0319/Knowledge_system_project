@@ -164,7 +164,10 @@ export default {
       const uploadPromises = files.map(async (file) => {
         try {
 		  if (file.has_upload === false) {
-			  const realFile = await getFileFromUrl(file.fileUrl, file.fileName);
+			  
+			  const urlObj = new URL(file.fileUrl);
+			  const newPath = baseUrl + urlObj.pathname + urlObj.search + urlObj.hash;
+			  const realFile = await getFileFromUrl(newPath, file.fileName);
 			  console.log('Real file:', realFile);
 			  const response = await uploadDocument(realFile);
 			  console.log('Upload response:', response);

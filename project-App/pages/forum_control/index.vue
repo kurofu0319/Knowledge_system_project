@@ -22,7 +22,7 @@
           >
             {{ post.content }}
           </span>
-          <button @click="deletePost(post.id)" class="delete-btn">
+          <button @click="deletePost(post.id, post.userName)" class="delete-btn">
             <i class="fas fa-trash-alt"></i>
           </button>
         </div>
@@ -111,9 +111,9 @@ export default {
     toggleReplySelection(post, reply) {
       reply.selected = !reply.selected;
     },
-    deletePost(postId) {
+    deletePost(postId, userName) {
       if (confirm("确定删除帖子？")) {
-        deletePostById(postId).then(() => {
+        deletePostById(postId, userName).then(() => {
           this.fetchPosts();
         }).catch(error => {
           console.error("Failed to delete post:", error);
@@ -141,7 +141,7 @@ export default {
       let content = '';
       this.filteredPosts.forEach(post => {
         if (post.selected) {
-          content += `Q: ${post.content}\n`;
+          content += `Q: ${post.content}`;
           post.replies.forEach(reply => {
             if (reply.selected) {
               content += `A: ${reply.content}\n`;
