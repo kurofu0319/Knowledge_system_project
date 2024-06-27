@@ -17,8 +17,14 @@
           <view class="table-cell">{{ user.createTime }}</view>
           <view class="table-cell">{{ user.admin ? '是' : '否' }}</view>
           <view class="table-cell">
-            <button @click="handleEditUser(user.userId)">编辑</button>
-            <button @click="handleDeleteUser(user.userId)">删除</button>
+            <view class="action-buttons">
+              <button class="edit-btn" @click="handleEditUser(user.userId)">
+                <i class="fas fa-cog"></i>
+              </button>
+              <button class="delete-btn" @click="handleDeleteUser(user.userId)">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </view>
           </view>
         </view>
       </view>
@@ -73,7 +79,8 @@ export default {
   padding: 10px;
 }
 .title {
-  font-size: 20px;
+  font-size: 32px;
+  font-weight: bold;
 }
 .content {
   padding: 10px;
@@ -92,9 +99,35 @@ export default {
   text-align: center;
 }
 .table-header {
-  background-color: #f5f5f5;
+  background-color: white;
 }
-.table-cell button {
+.table-row {
+  background-color: white; /* 将表格的所有行背景颜色设为白色 */
+}
+.action-buttons {
+  display: flex;
+  justify-content: center;
+}
+.action-buttons button {
+  width: 40px;
+  height: 40px;
   margin: 0 5px;
+  font-size: 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.edit-btn {
+  background-color: white;
+  color: #007bff;
+  border-radius: 4px;
+}
+.delete-btn {
+  background-color: white;
+  color: #ff4d4f;
+  border-radius: 4px;
 }
 </style>

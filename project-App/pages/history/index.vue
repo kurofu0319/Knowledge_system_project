@@ -1,7 +1,7 @@
 <template>
   <view class="history-container">
     <view v-if="searchHistory.length > 0">
-      <uni-section title="搜索历史记录" type="line"></uni-section>
+      <uni-section title="历史记录" type="line"></uni-section>
       <view class="search-history">
         <table>
           <thead>
@@ -66,6 +66,7 @@ export default {
 table {
   width: 100%;
   border-collapse: collapse;
+  background-color: white;
 }
 
 th,
@@ -75,7 +76,7 @@ td {
 }
 
 th {
-  background-color: #f2f2f2;
+  background-color: white;
   text-align: left;
 }
 </style>

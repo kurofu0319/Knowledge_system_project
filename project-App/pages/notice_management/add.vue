@@ -5,18 +5,18 @@
     </view>
     <view class="content">
       <view class="form-item">
-        <text>标题</text>
-        <input v-model="notice.noticeTitle" placeholder="请输入标题"/>
+        <text>标题:</text>
+        <input v-model="notice.noticeTitle" placeholder="请输入标题" class="input-box"/>
       </view>
       <view class="form-item">
-        <text>类型</text>
+        <text>类型:</text>
         <picker mode="selector" :range="['通知', '公告']" @change="handleTypeChange">
           <view class="picker">{{ noticeType }}</view>
         </picker>
       </view>
       <view class="form-item">
-        <text>内容</text>
-        <textarea v-model="notice.noticeContent" placeholder="请输入内容"></textarea>
+        <text>内容:</text>
+        <textarea v-model="notice.noticeContent" placeholder="请输入内容" class="textarea-box"></textarea>
       </view>
       <button @click="handleSubmit">提交</button>
     </view>
@@ -72,16 +72,31 @@ export default {
 <style scoped>
 .header {
   display: flex;
-  justify-content: center;
+  justify-content: left;
   align-items: center;
   padding: 10px;
 }
 .title {
-  font-size: 20px;
+  font-size: 32px;
+  font-weight: bold; /* 加粗标题 */
 }
 .content {
   padding: 10px;
 }
+.input-box {
+  padding: 20px;
+  border: 1px solid #ccc;
+  width: 100%;
+  box-sizing: border-box; /* 确保 padding 不会影响元素的总宽度 */
+}
+
+.textarea-box {
+  padding: 10px;
+  border: 1px solid #ccc;
+  width: 100%;
+  box-sizing: border-box; /* 确保 padding 不会影响元素的总宽度 */
+}
+
 .form-item {
   margin-bottom: 10px;
 }

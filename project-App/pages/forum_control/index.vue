@@ -1,16 +1,13 @@
 <template>
   <div class="admin-forum-container">
-	<div class="title">
-		<h1>论坛管理</h1>
-		<button class="update-button" @click="navigateToDetail"> 查看已上传 </button>
-	</div>
+    <div class="title">
+      <h1>论坛管理</h1>
+      <button class="update-button" @click="navigateToDetail"> 查看已上传 </button>
+    </div>
     <div class="filter-options">
-      <select v-model="filterDays" @change="filterPosts">
-        <option value="0">全部</option>
-        <option value="3">三天内</option>
-        <option value="7">一周内</option>
-        <option value="30">一个月内</option>
-      </select>
+      <picker mode="selector" :range="filterOptions" @change="handleFilterChange">
+        <view class="picker">{{ filterOptions[filterDays] }}</view>
+      </picker>
     </div>
     <div class="post-list">
       <div v-for="post in filteredPosts" :key="post.id" class="post-item">
@@ -25,7 +22,9 @@
           >
             {{ post.content }}
           </span>
-          <span @click="deletePost(post.id)" class="delete-text">删除</span>
+          <button @click="deletePost(post.id)" class="delete-btn">
+            <i class="fas fa-trash-alt"></i>
+          </button>
         </div>
         <div v-if="post.showReplies" class="replies">
           <div v-for="reply in post.replies" :key="reply.id" class="reply-item">
@@ -36,20 +35,16 @@
             >
               {{ reply.content }}
             </span>
-            <span @click="deleteReply(reply.id)" class="delete-text">删除</span>
+            <button @click="deleteReply(reply.id)" class="delete-btn">
+              <i class="fas fa-trash-alt"></i>
+            </button>
           </div>
         </div>
       </div>
     </div>
     <button @click="generateAndUploadTxt">生成并上传TXT</button>
-	
   </div>
 </template>
-
-
-
-
-
 
 <script>
 import { getAllPosts, getRepliesByPostId, deletePostById, deleteReplyById } from '@/api/forum';
@@ -65,6 +60,7 @@ export default {
     return {
       posts: [],
       filterDays: 0, // 默认显示全部
+      filterOptions: ['全部', '三天内', '一周内', '一个月内'],
       filteredPosts: []
     };
   },
@@ -81,6 +77,10 @@ export default {
       }).catch(error => {
         console.error("Failed to fetch posts:", error);
       });
+    },
+    handleFilterChange(event) {
+      this.filterDays = event.detail.value;
+      this.filterPosts();
     },
     toggleReplies(postId) {
       const post = this.posts.find(post => post.id === postId);
@@ -102,9 +102,9 @@ export default {
         }
       }
     },
-	navigateToDetail() {
-		this.$tab.navigateTo("/pages/forum_control/detail");
-	},
+    navigateToDetail() {
+      this.$tab.navigateTo("/pages/forum_control/detail");
+    },
     togglePostSelection(post) {
       post.selected = !post.selected;
     },
@@ -134,7 +134,7 @@ export default {
       this.filteredPosts = this.posts.filter(post => {
         const postDate = new Date(post.postTime);
         const diffDays = (now - postDate) / (1000 * 60 * 60 * 24);
-        return this.filterDays == 0 || diffDays <= this.filterDays;
+        return this.filterDays == 0 || diffDays <= [0, 3, 7, 30][this.filterDays];
       });
     },
     generateTxtContent() {
@@ -164,13 +164,13 @@ export default {
         }
       }).then(response => {
         console.log('File uploaded successfully:', response.data);
-		const fileName = response.data.newFileName;
-		const fileUrl = response.data.url;
-		saveFileInfo(fileName, fileUrl).then(saveResponse => {
-		          // console.log('File URL saved successfully:', saveResponse);
-		        }).catch(saveError => {
-		          console.error('Failed to save file URL:', saveError);
-		        });
+        const fileName = response.data.newFileName;
+        const fileUrl = response.data.url;
+        saveFileInfo(fileName, fileUrl).then(saveResponse => {
+          // console.log('File URL saved successfully:', saveResponse);
+        }).catch(saveError => {
+          console.error('Failed to save file URL:', saveError);
+        });
 
       }).catch(error => {
         console.error('File upload failed:', error);
@@ -183,19 +183,21 @@ export default {
 }
 </script>
 
-
 <style scoped>
-	
 .update-button {
-	position: absolute;/*或relative*/ 
-	top: 10px;
-	left: 70%;
+  position: absolute; /*或relative*/ 
+  top: 20px;
+  left: 70%;
+  width: 100px; /* 调整按钮宽度 */
+  height: 40px; /* 调整按钮高度 */
+  padding: 5px 10px; /* 减小内边距 */ 
+  font-size: 14px;
 }
 
-.title	 {
-	display: flex;
-}	
-	
+.title {
+  display: flex;
+}
+
 .admin-forum-container {
   padding: 20px;
   background-color: #f9f9f9;
@@ -204,12 +206,14 @@ export default {
 
 .filter-options {
   margin-bottom: 20px;
+  width: 100px;
 }
 
-.filter-options select {
-  padding: 5px 10px;
+.picker {
+  padding: 10px;
+  border: 1px solid #ccc;
   border-radius: 5px;
-  border: 1px solid #ddd;
+  background-color: white;
 }
 
 .post-list {
@@ -245,12 +249,22 @@ export default {
   background-color: #e0f7fa;
 }
 
-.delete-text {
-  position: absolute;
-  right: 10px;
-  color: red;
+.delete-btn {
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  color: white;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
-  text-decoration: underline;
+  margin-left: 10px;
+}
+
+.delete-btn i {
+  color: #ff4d4f;
 }
 
 .replies {
@@ -274,11 +288,6 @@ export default {
 
 .reply-content.selected {
   background-color: #e0f7fa;
-}
-
-.reply-item .delete-text {
-  position: absolute;
-  right: 10px;
 }
 
 h1 {

@@ -16,9 +16,13 @@
         <tr v-for="file in uploadedFiles" :key="file.id">
           <td>{{ file.fileName }}</td>
           <td>{{ file.uploadDate }}</td>
-          <td>
-            <a href="#" @click="downloadFile(file.fileUrl, file.fileName)">下载</a>
-			<a href="#" @click="deleteFile(file.fileUrl, file.fileName)">删除</a>
+          <td class="action-buttons">
+            <button class="download-btn" @click="downloadFile(file.fileUrl, file.fileName)">
+              <i class="fas fa-download"></i>
+            </button>
+            <button class="delete-btn" @click="deleteFile(file.fileUrl, file.fileName)">
+              <i class="fas fa-trash-alt"></i>
+            </button>
           </td>
         </tr>
       </tbody>
@@ -162,12 +166,17 @@ th {
   background-color: #f2f2f2;
 }
 
-a {
-  color: #007bff;
-  text-decoration: none;
+
+.download-btn i {
+  color: royalblue;
 }
 
-a:hover {
-  text-decoration: underline;
+.delete-btn {
+  background-color: #ff4d4f;
 }
+
+.delete-btn i {
+  color: white;
+}
+
 </style>
